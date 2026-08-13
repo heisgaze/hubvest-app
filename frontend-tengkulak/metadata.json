@@ -1,0 +1,6 @@
+{
+  "name": "TaniPro - Harga Pasar & Catat Panen",
+  "description": "Aplikasi pantau harga pasar pertanian real-time, pencatatan hasil panen, dan koneksi petani terdekat.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
