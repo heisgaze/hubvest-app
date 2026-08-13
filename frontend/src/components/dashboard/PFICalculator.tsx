@@ -3,11 +3,17 @@
 import React, { useState, useEffect } from "react";
 import { calculatePFI } from "@/lib/utils";
 
-export default function PFICalculator() {
+export default function PFICalculator({ defaultMarketPrice }: { defaultMarketPrice?: number }) {
   const [farmerPrice, setFarmerPrice] = useState<number>(28000);
-  const [marketPrice, setMarketPrice] = useState<number>(35000);
-  const [pfiResult, setPfiResult] = useState(calculatePFI(28000, 35000));
+  const [marketPrice, setMarketPrice] = useState<number>(defaultMarketPrice || 35000);
+  const [pfiResult, setPfiResult] = useState(calculatePFI(28000, defaultMarketPrice || 35000));
   
+  useEffect(() => {
+    if (defaultMarketPrice) {
+      setMarketPrice(defaultMarketPrice);
+    }
+  }, [defaultMarketPrice]);
+
   useEffect(() => {
     setPfiResult(calculatePFI(farmerPrice || 0, marketPrice || 0));
   }, [farmerPrice, marketPrice]);

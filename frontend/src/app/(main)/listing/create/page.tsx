@@ -1,28 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { useTransition } from "react";
 import HeaderBar from "@/components/ui/HeaderBar";
 import { commodities, currentUser } from "@/lib/mock-data";
 import { useRouter } from "next/navigation";
+import { createListingAction } from "@/app/actions";
 
 export default function CreateListingPage() {
   const router = useRouter();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    // Simulate API call
-    setTimeout(() => {
-      router.push("/listing");
-    }, 1000);
+  const formAction = async (formData: FormData) => {
+    startTransition(async () => {
+      try {
+        await createListingAction(formData);
+        router.push("/listing");
+      } catch (e) {
+        console.error(e);
+      }
+    });
   };
 
   return (
     <div className="min-h-screen bg-gray-50 pb-8">
       <HeaderBar title="Buat Listing Baru" showBack />
       
-      <form onSubmit={handleSubmit} className="p-4 space-y-6">
+      <form action={formAction} className="p-4 space-y-6">
         {/* Photo Upload Area */}
         <div className="border-2 border-dashed border-gray-300 rounded-2xl bg-white p-6 flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-gray-50 transition-colors h-40">
           <div className="w-12 h-12 rounded-full bg-surface-bg flex items-center justify-center text-primary mb-1">
@@ -39,7 +42,7 @@ export default function CreateListingPage() {
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">Komoditas</label>
-            <select className="w-full bg-white rounded-xl border border-gray-200 px-4 py-3 text-gray-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none" required>
+            <select name="commodity" className="w-full bg-white rounded-xl border border-gray-200 px-4 py-3 text-gray-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none" required>
               <option value="">Pilih Komoditas...</option>
               {commodities.map(c => (
                 <option key={c.id} value={c.id}>{c.name}</option>
@@ -50,11 +53,11 @@ export default function CreateListingPage() {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Volume</label>
-              <input type="number" placeholder="Contoh: 500" className="w-full bg-white rounded-xl border border-gray-200 px-4 py-3 text-gray-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" required min="1" />
+              <input name="quantity" type="number" placeholder="Contoh: 500" className="w-full bg-white rounded-xl border border-gray-200 px-4 py-3 text-gray-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" required min="1" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Satuan</label>
-              <select className="w-full bg-white rounded-xl border border-gray-200 px-4 py-3 text-gray-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none">
+              <select name="unit" className="w-full bg-white rounded-xl border border-gray-200 px-4 py-3 text-gray-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none">
                 <option value="kg">Kilogram (kg)</option>
                 <option value="ton">Ton</option>
               </select>
@@ -68,7 +71,7 @@ export default function CreateListingPage() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">Lokasi Pengambilan</label>
-            <input type="text" defaultValue={currentUser.location} className="w-full bg-white rounded-xl border border-gray-200 px-4 py-3 text-gray-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" required />
+            <input name="location" type="text" defaultValue={currentUser.location} className="w-full bg-white rounded-xl border border-gray-200 px-4 py-3 text-gray-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" required />
           </div>
 
           <div>
@@ -77,18 +80,18 @@ export default function CreateListingPage() {
               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                 <span className="text-gray-500 font-medium">Rp</span>
               </div>
-              <input type="number" placeholder="0" className="w-full bg-white rounded-xl border border-gray-200 pl-12 pr-4 py-3 text-gray-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" required min="100" />
+              <input name="price" type="number" placeholder="0" className="w-full bg-white rounded-xl border border-gray-200 pl-12 pr-4 py-3 text-gray-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" required min="100" />
             </div>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">Deskripsi Tambahan</label>
-            <textarea placeholder="Contoh: Kualitas super, hasil panen baru..." rows={3} className="w-full bg-white rounded-xl border border-gray-200 px-4 py-3 text-gray-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none"></textarea>
+            <textarea name="description" placeholder="Contoh: Kualitas super, hasil panen baru..." rows={3} className="w-full bg-white rounded-xl border border-gray-200 px-4 py-3 text-gray-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none"></textarea>
           </div>
         </div>
 
-        <button type="submit" disabled={isSubmitting} className="w-full btn-primary py-3.5 rounded-xl font-bold mt-4">
-          {isSubmitting ? 'Menyimpan...' : 'Buat Listing'}
+        <button type="submit" disabled={isPending} className="w-full btn-primary py-3.5 rounded-xl font-bold mt-4">
+          {isPending ? 'Menyimpan...' : 'Buat Listing'}
         </button>
       </form>
     </div>

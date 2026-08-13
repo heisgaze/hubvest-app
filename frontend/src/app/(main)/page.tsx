@@ -1,11 +1,13 @@
 import React from "react";
-import { currentUser, marketPrices } from "@/lib/mock-data";
-import PFICalculator from "@/components/dashboard/PFICalculator";
-import MarketPriceSection from "@/components/dashboard/MarketPriceSection";
+import { currentUser } from "@/lib/mock-data";
+import { fetchMarketPrices } from "@/lib/api";
+import DashboardInteractive from "@/components/dashboard/DashboardInteractive";
 import TrendCard from "@/components/dashboard/TrendCard";
 import HeaderBar from "@/components/ui/HeaderBar";
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const marketPrices = await fetchMarketPrices();
+  
   const trending = [
     { name: "Bawang Merah", change: 5.2, trend: "up" as const },
     { name: "Cabai Rawit", change: -2.1, trend: "down" as const },
@@ -32,9 +34,7 @@ export default function DashboardPage() {
       />
       
       <main className="px-4 py-4 space-y-6">
-        <PFICalculator />
-        
-        <MarketPriceSection marketPrices={marketPrices} />
+        <DashboardInteractive initialMarketPrices={marketPrices} />
 
         <div className="animate-slide-up" style={{ animationDelay: "0.2s" }}>
           <div className="flex justify-between items-center mb-4 px-1">

@@ -1,34 +1,34 @@
-"use client";
-
 import React from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import HeaderBar from "@/components/ui/HeaderBar";
 import GradeResultCard from "@/components/scan/GradeResultCard";
-import { mockScanResult } from "@/lib/mock-data";
+import { analyzeCV } from "@/lib/api";
 
-export default function ScanResultPage() {
-  const router = useRouter();
+export default async function ScanResultPage() {
+  const result = await analyzeCV();
 
   return (
     <div className="min-h-screen bg-surface-bg pb-24">
       <HeaderBar title="Hasil Scan" showBack={true} />
       
       <main className="px-4 py-2">
-        <GradeResultCard result={mockScanResult} />
+        {result ? (
+          <GradeResultCard result={result} />
+        ) : (
+          <div className="text-center py-10 text-red-500">Gagal menganalisis gambar.</div>
+        )}
         
         <div className="mt-8 flex flex-col gap-3">
-          <button 
-            className="btn-primary"
-            onClick={() => router.push("/listing/create")}
-          >
-            Simpan ke Listing
-          </button>
-          <button 
-            className="btn-secondary"
-            onClick={() => router.back()}
-          >
-            Scan Ulang
-          </button>
+          <Link href="/listing/create">
+            <button className="w-full btn-primary">
+              Simpan ke Listing
+            </button>
+          </Link>
+          <Link href="/scan">
+            <button className="w-full btn-secondary">
+              Scan Ulang
+            </button>
+          </Link>
         </div>
       </main>
     </div>

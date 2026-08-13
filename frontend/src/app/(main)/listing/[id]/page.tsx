@@ -1,19 +1,21 @@
-"use client";
-
-import { useParams } from "next/navigation";
 import HeaderBar from "@/components/ui/HeaderBar";
 import Badge, { gradeToBadgeVariant } from "@/components/ui/Badge";
 import StarRating from "@/components/ui/StarRating";
 import BidCard from "@/components/listing/BidCard";
-import { listings, bids } from "@/lib/mock-data";
+import BidForm from "@/components/listing/BidForm";
+import { fetchListing } from "@/lib/api";
+import { getRoleCookie } from "@/app/actions";
 import { formatRupiah, formatShortDate, getCommodityEmoji } from "@/lib/utils";
 
-export default function ListingDetailPage() {
-  const params = useParams();
-  const id = params?.id as string;
+export default async function ListingDetailPage({ params }: { params: { id: string } }) {
+  const id = params.id;
+  const roleId = await getRoleCookie();
+  const isTengkulak = roleId === "c25594e8-7901-40ae-b202-da8d1512990d";
   
-  const listing = listings.find((l) => l.id === id) || listings[0];
-  const listingBids = bids.filter((b) => b.listingId === listing.id);
+  const data = await fetchListing(id);
+  if (!data) return null;
+  
+  const { listing, bids: listingBids } = data;
 
   if (!listing) return null;
 
@@ -105,6 +107,10 @@ export default function ListingDetailPage() {
           )}
         </div>
       </div>
+      
+      {isTengkulak && listing.status === "active" && (
+        <BidForm listingId={listing.id} minPrice={listing.minPrice} />
+      )}
     </div>
   );
 }
