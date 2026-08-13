@@ -1,0 +1,156 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap");
+
+@layer base {
+  :root {
+    --color-primary: #1b4332;
+    --color-primary-light: #2d6a4f;
+    --color-accent: #52b788;
+    --color-bg: #f0f7f4;
+    --color-card: #ffffff;
+    --color-text: #1a1a2e;
+    --color-text-muted: #6b7280;
+    --bottom-nav-height: 72px;
+    --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    font-family: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-surface-bg text-text;
+    padding-bottom: calc(var(--bottom-nav-height) + var(--safe-area-bottom));
+    overscroll-behavior-y: contain;
+  }
+
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@layer components {
+  /* Card */
+  .card {
+    @apply bg-surface rounded-2xl shadow-card;
+  }
+  .card-hover {
+    @apply card transition-all duration-200 hover:shadow-card-hover active:scale-[0.98];
+  }
+
+  /* Glass morphism */
+  .glass {
+    @apply bg-white/80 backdrop-blur-lg border border-white/20;
+  }
+
+  /* PFI Colors */
+  .pfi-green {
+    @apply bg-accent/10 text-accent-dark border border-accent/20;
+  }
+  .pfi-yellow {
+    @apply bg-warning-light text-warning-dark border border-warning/20;
+  }
+  .pfi-red {
+    @apply bg-danger-light text-danger-dark border border-danger/20;
+  }
+
+  /* Gradient backgrounds */
+  .gradient-primary {
+    background: linear-gradient(135deg, #1b4332 0%, #2d6a4f 50%, #40916c 100%);
+  }
+  .gradient-accent {
+    background: linear-gradient(135deg, #52b788 0%, #74c69d 100%);
+  }
+
+  /* Status badges */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold;
+  }
+  .badge-active {
+    @apply badge bg-accent/10 text-accent-dark;
+  }
+  .badge-pending {
+    @apply badge bg-warning-light text-warning-dark;
+  }
+  .badge-done {
+    @apply badge bg-primary-100 text-primary;
+  }
+
+  /* Bottom safe area */
+  .pb-safe {
+    padding-bottom: calc(var(--bottom-nav-height) + var(--safe-area-bottom) + 16px);
+  }
+
+  /* Shimmer loading */
+  .shimmer {
+    @apply animate-pulse bg-gray-200 rounded-xl;
+  }
+
+  /* Grade badges */
+  .grade-a {
+    @apply bg-accent text-white;
+  }
+  .grade-b {
+    @apply bg-primary-400 text-white;
+  }
+  .grade-c {
+    @apply bg-warning text-white;
+  }
+
+  /* Button base */
+  .btn-primary {
+    @apply w-full py-3.5 rounded-2xl font-semibold text-white gradient-primary 
+           transition-all duration-200 active:scale-[0.98] shadow-md
+           hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-secondary {
+    @apply w-full py-3.5 rounded-2xl font-semibold text-primary border-2 border-primary
+           transition-all duration-200 active:scale-[0.98]
+           hover:bg-primary-50 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-ghost {
+    @apply w-full py-3.5 rounded-2xl font-semibold text-text-secondary
+           transition-all duration-200 active:scale-[0.98]
+           hover:bg-gray-100;
+  }
+
+  /* Scan viewfinder */
+  .scan-frame {
+    @apply relative w-64 h-64 mx-auto;
+  }
+  .scan-corner {
+    @apply absolute w-8 h-8 border-accent;
+  }
+  .scan-corner-tl {
+    @apply scan-corner top-0 left-0 border-t-[3px] border-l-[3px] rounded-tl-lg;
+  }
+  .scan-corner-tr {
+    @apply scan-corner top-0 right-0 border-t-[3px] border-r-[3px] rounded-tr-lg;
+  }
+  .scan-corner-bl {
+    @apply scan-corner bottom-0 left-0 border-b-[3px] border-l-[3px] rounded-bl-lg;
+  }
+  .scan-corner-br {
+    @apply scan-corner bottom-0 right-0 border-b-[3px] border-r-[3px] rounded-br-lg;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
