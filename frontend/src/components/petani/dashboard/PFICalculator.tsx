@@ -32,24 +32,24 @@ export default function PFICalculator({ defaultMarketPrice }: { defaultMarketPri
   else if (pfiResult.score >= 75) gaugeColor = "#F59E0B"; // yellow
 
   return (
-    <div className="card p-5 animate-scale-in">
-      <h2 className="text-lg font-semibold text-primary mb-4">Price Fairness Index</h2>
+    <div className="bg-white rounded-[26px] p-5 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-gray-100/90 animate-scale-in">
+      <h2 className="text-lg font-bold text-[#12241A] mb-4">Price Fairness Index</h2>
       
       <div className="flex gap-4 mb-6">
         <div className="flex-1">
-          <label className="block text-xs font-medium text-gray-500 mb-1">Harga Petani</label>
+          <label className="block text-[9px] uppercase font-bold tracking-wider text-gray-400 mb-1.5">Harga Petani</label>
           <input 
             type="number" 
-            className="w-full bg-surface-bg border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-accent"
+            className="w-full bg-[#F8F9FA] border border-gray-200/80 rounded-xl px-4 py-2.5 text-sm font-extrabold text-[#12241A] focus:outline-none focus:border-[#2A4736] focus:ring-1 focus:ring-[#2A4736]"
             value={farmerPrice}
             onChange={(e) => setFarmerPrice(Number(e.target.value))}
           />
         </div>
         <div className="flex-1">
-          <label className="block text-xs font-medium text-gray-500 mb-1">Harga Pasar</label>
+          <label className="block text-[9px] uppercase font-bold tracking-wider text-gray-400 mb-1.5">Harga Pasar</label>
           <input 
             type="number" 
-            className="w-full bg-gray-100 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-500 cursor-not-allowed"
+            className="w-full bg-gray-100/70 border border-gray-200/50 rounded-xl px-4 py-2.5 text-sm font-extrabold text-gray-500 cursor-not-allowed"
             value={marketPrice}
             readOnly
           />
@@ -89,10 +89,10 @@ export default function PFICalculator({ defaultMarketPrice }: { defaultMarketPri
           />
         </svg>
         <div className="absolute top-8 flex flex-col items-center">
-          <span className="text-3xl font-bold" style={{ color: gaugeColor }}>
+          <span className="text-3xl font-black" style={{ color: gaugeColor }}>
             {pfiResult.score.toFixed(0)}
           </span>
-          <span className="text-xs text-gray-500 font-medium mt-1">PFI Score</span>
+          <span className="text-[10px] uppercase font-bold tracking-wider text-gray-400 mt-1">PFI Score</span>
         </div>
       </div>
 
