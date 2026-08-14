@@ -66,7 +66,7 @@ export default function BidCard({ bid }: BidCardProps) {
   if (isHidden) return null;
 
   return (
-    <div className="bg-white rounded-[26px] p-5 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-gray-100/90 mb-3 animate-slide-up">
+    <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 mb-3 animate-slide-up">
       <div className="flex gap-3 mb-3">
         {/* Avatar */}
         <div className="w-10 h-10 rounded-full bg-primary-light flex items-center justify-center text-white font-bold flex-shrink-0">
@@ -75,7 +75,7 @@ export default function BidCard({ bid }: BidCardProps) {
         
         <div className="flex-1">
           <div className="flex items-center gap-1">
-            <h4 className="font-bold text-[#12241A] text-base">{bid.tengkulak?.name}</h4>
+            <h4 className="font-semibold text-gray-800 text-sm">{bid.tengkulak?.name}</h4>
             {bid.tengkulak?.verified && (
               <span className="text-blue-500 text-xs">✓</span>
             )}
@@ -89,14 +89,14 @@ export default function BidCard({ bid }: BidCardProps) {
         </div>
         
         <div className="text-right">
-          <p className="font-extrabold text-[#12241A] text-lg">
+          <p className="font-bold text-primary text-base">
             {formatRupiah(bid.price)}
           </p>
         </div>
       </div>
 
-      <div className="bg-[#F8F9FA] border border-gray-100/80 rounded-[20px] p-4 mb-4">
-        <p className="text-sm text-gray-500 font-medium line-clamp-2">
+      <div className="bg-surface-bg rounded-xl p-3 mb-3">
+        <p className="text-sm text-gray-600 line-clamp-2">
           &quot;{bid.message}&quot;
         </p>
       </div>
@@ -105,14 +105,14 @@ export default function BidCard({ bid }: BidCardProps) {
         <button 
           onClick={handleRejectBid}
           disabled={isRejecting || isAccepting}
-          className="flex-1 py-2.5 px-4 rounded-full border border-red-500 text-red-500 font-bold text-xs hover:bg-red-50 transition-colors disabled:opacity-50 active:scale-95"
+          className="flex-1 py-2 px-4 rounded-xl border border-red-500 text-red-500 font-medium text-sm hover:bg-red-50 transition-colors disabled:opacity-50"
         >
           {isRejecting ? "Memproses..." : "Tolak"}
         </button>
         <button 
           onClick={handleAcceptBid}
           disabled={isAccepting || isRejecting}
-          className="flex-1 py-2.5 px-4 rounded-full bg-[#2A4736] hover:bg-[#1f3729] text-white font-bold text-xs transition-colors shadow-2xs disabled:opacity-50 active:scale-95"
+          className="flex-1 py-2 px-4 rounded-xl bg-primary text-white font-medium text-sm hover:bg-primary-light transition-colors shadow-sm disabled:opacity-50"
         >
           {isAccepting ? "Memproses..." : "Terima"}
         </button>

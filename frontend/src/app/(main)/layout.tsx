@@ -1,7 +1,6 @@
 import BottomNav from "@/components/petani/ui/BottomNav";
 import RoleSwitcher from "@/components/common/RoleSwitcher";
 import { getRoleCookie } from "@/app/actions";
-import { MobileFrame } from "@/components/common/MobileFrame";
 
 export default async function MainLayout({
   children,
@@ -21,12 +20,10 @@ export default async function MainLayout({
   }
 
   return (
-    <MobileFrame>
-      <div id="app-root-frame" className="min-h-screen flex flex-col bg-[#F8F9FA] relative">
-        <main className="flex-1 overflow-y-auto no-scrollbar pb-24">{children}</main>
-        <BottomNav />
-        <RoleSwitcher currentRoleId={roleId} />
-      </div>
-    </MobileFrame>
+    <div className="max-w-md mx-auto min-h-screen bg-surface-bg relative">
+      <main className="pb-safe">{children}</main>
+      <BottomNav />
+      <RoleSwitcher currentRoleId={roleId} />
+    </div>
   );
 }
