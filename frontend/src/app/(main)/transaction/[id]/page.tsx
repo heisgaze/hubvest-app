@@ -3,6 +3,7 @@ import HeaderBar from "@/components/petani/ui/HeaderBar";
 import ContractSummary from "@/components/petani/transaction/ContractSummary";
 import StatusTimeline from "@/components/petani/transaction/StatusTimeline";
 import MarkAsPickedUpButton from "@/components/petani/transaction/MarkAsPickedUpButton";
+import CancelTransactionButton from "@/components/petani/transaction/CancelTransactionButton";
 import { fetchTransactionDetail } from "@/lib/api";
 
 export default async function TransactionDetailPage({ params }: { params: { id: string } }) {
@@ -24,8 +25,11 @@ export default async function TransactionDetailPage({ params }: { params: { id: 
 
       {/* Action Buttons based on status */}
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-100 max-w-md mx-auto z-10 pb-safe">
-        {transaction.status === "pickup_scheduled" && (
-          <MarkAsPickedUpButton transactionId={transaction.id} />
+        {(transaction.status === "pickup_scheduled" || transaction.status === "waiting_pickup") && (
+          <>
+            <MarkAsPickedUpButton transactionId={transaction.id} />
+            <CancelTransactionButton transactionId={transaction.id} />
+          </>
         )}
         
         {transaction.status === "completed" && (

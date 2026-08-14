@@ -112,8 +112,10 @@ export interface Transaction {
   status:
     | "pending_confirmation"
     | "confirmed"
+    | "waiting_pickup"
     | "pickup_scheduled"
     | "completed"
+    | "cancelled"
     | "rated";
   pickupDate: string;
   pickupLocation: string;

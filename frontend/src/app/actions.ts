@@ -13,7 +13,7 @@ export async function getRoleCookie() {
   const cookieStore = cookies();
   const userId = cookieStore.get("X-User-Id")?.value;
   // Default to Farmer if not set
-  return userId || "5a351aad-6070-4264-a6e0-bed3232ab399";
+  return userId || "u1";
 }
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";

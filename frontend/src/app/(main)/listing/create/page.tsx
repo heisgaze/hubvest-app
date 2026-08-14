@@ -70,12 +70,16 @@ export default function CreateListingPage({ searchParams }: { searchParams: { gr
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">Komoditas</label>
+            {searchParams.commodity ? (
+              <input type="hidden" name="commodity" value={selectedCommodity} />
+            ) : null}
             <select 
-              name="commodity" 
+              name={searchParams.commodity ? "_commodity_disabled" : "commodity"} 
               value={selectedCommodity}
               onChange={(e) => setSelectedCommodity(e.target.value)}
-              className="w-full bg-white rounded-xl border border-gray-200 px-4 py-3 text-gray-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none" 
+              className="w-full bg-white rounded-xl border border-gray-200 px-4 py-3 text-gray-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed" 
               required
+              disabled={!!searchParams.commodity}
             >
               <option value="">Pilih Komoditas...</option>
               {commodities.map(c => (

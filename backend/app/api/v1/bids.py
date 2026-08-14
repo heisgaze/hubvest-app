@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.orm import Session
 from ...db.database import get_db
 from ...db.models import Bid, Listing, MarketPrice, Transaction
@@ -132,23 +132,27 @@ def reject_bid(bid_id: str, db: Session = Depends(get_db)):
     return {"success": True, "message": "Bid rejected"}
 
 @router.get("/me/bids", response_model=List[schemas.Bid])
-def get_my_bids(db: Session = Depends(get_db)):
+def get_my_bids(request: Request, db: Session = Depends(get_db)):
     """
     Get all bids made by the current Tengkulak.
-    (Mock implementation: returns all bids by user 'u2')
     """
-    # Assuming 'u2' is our mock Tengkulak
-    bids = db.query(Bid).filter(Bid.bidder_id == "u2").order_by(Bid.created_at.desc()).all()
+    user_id = request.headers.get("X-User-Id")
+    if not user_id:
+        user_id = "c25594e8-7901-40ae-b202-da8d1512990d" # Default Tengkulak
+        
+    bids = db.query(Bid).filter(Bid.bidder_id == user_id).order_by(Bid.created_at.desc()).all()
     return bids
 
 @router.get("/incoming/bids", response_model=List[schemas.Bid])
-def get_incoming_bids(db: Session = Depends(get_db)):
+def get_incoming_bids(request: Request, db: Session = Depends(get_db)):
     """
     Get all incoming bids for listings owned by the current Petani.
-    (Mock implementation: returns bids for listings owned by 'u1')
     """
-    # Assuming 'u1' is our mock Petani
+    user_id = request.headers.get("X-User-Id")
+    if not user_id:
+        user_id = "5a351aad-6070-4264-a6e0-bed3232ab399" # Default Petani
+        
     bids = db.query(Bid).join(Listing, Bid.listing_id == Listing.id).filter(
-        Listing.seller_id == "u1"
+        Listing.seller_id == user_id
     ).order_by(Bid.created_at.desc()).all()
     return bids

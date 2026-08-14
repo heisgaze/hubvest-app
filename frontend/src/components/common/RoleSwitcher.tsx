@@ -1,24 +1,28 @@
 "use client";
-
-import { useTransition } from "react";
+import { useState } from "react";
 import { setRoleCookie } from "@/app/actions";
+import { useRouter } from "next/navigation";
 
 // Using the mock IDs from the database seeder
-const FARMER_ID = "5a351aad-6070-4264-a6e0-bed3232ab399";
-const TENGKULAK_ID = "c25594e8-7901-40ae-b202-da8d1512990d";
+const FARMER_ID = "u1";
+const TENGKULAK_ID = "t1";
 
 export default function RoleSwitcher({ currentRoleId }: { currentRoleId: string }) {
-  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
+  const [isPending, setIsPending] = useState(false);
 
   const isFarmer = currentRoleId === FARMER_ID;
   const targetId = isFarmer ? TENGKULAK_ID : FARMER_ID;
   const label = isFarmer ? "Switch to Tengkulak" : "Switch to Farmer";
 
-  const handleSwitch = () => {
-    startTransition(() => {
-      setRoleCookie(targetId);
-      window.location.href = "/";
-    });
+  const handleSwitch = async () => {
+    setIsPending(true);
+    try {
+      await setRoleCookie(targetId);
+      router.push("/");
+    } finally {
+      setIsPending(false);
+    }
   };
 
   return (

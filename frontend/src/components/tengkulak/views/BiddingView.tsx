@@ -9,18 +9,20 @@ interface BiddingViewProps {
 }
 
 export const BiddingView: React.FC<BiddingViewProps> = ({ listing, onBack, onSubmitOffer }) => {
-  const [offerPrice, setOfferPrice] = useState<number>(20000);
+  const basePrice = listing.estimatedPrice || 20000;
+  const [offerPrice, setOfferPrice] = useState<number>(basePrice);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  const totalCommitment = offerPrice * 500; // 500 kg default volume
+  // Extract number from amount if it's a string like "500 Kg"
+  const volumeValue = typeof listing.amount === 'string' ? parseFloat(listing.amount) : (listing.amount || 500);
+  const totalCommitment = offerPrice * volumeValue;
 
   const handleAdjustPrice = (delta: number) => {
     setOfferPrice((prev) => Math.max(1000, prev + delta));
   };
 
   const handleQuickPreset = (factor: number) => {
-    const base = 20000;
-    setOfferPrice(Math.round(base * factor));
+    setOfferPrice(Math.round(basePrice * factor));
   };
 
   const handleSubmit = () => {
@@ -31,7 +33,7 @@ export const BiddingView: React.FC<BiddingViewProps> = ({ listing, onBack, onSub
         contractId: 'HB-8829-BS',
         commodityName: 'Bawang Merah',
         commodityPhoto: listing.commodityPhoto || 'https://images.unsplash.com/photo-1618512496248-a07fe83aa8cf?auto=format&fit=crop&q=80&w=800',
-        volumeKg: 500,
+        volumeKg: volumeValue,
         finalPrice: totalCommitment,
         pickupDate: '18 Okt 2023',
         logistics: 'Self-Pickup (Truk / Pikap)',
@@ -88,7 +90,7 @@ export const BiddingView: React.FC<BiddingViewProps> = ({ listing, onBack, onSub
                 </div>
                 <div className="text-right">
                   <div className="text-[10px] text-slate-300">Volume Lot</div>
-                  <div className="text-lg font-extrabold text-amber-300">500 Kg</div>
+                  <div className="text-lg font-extrabold text-amber-300">{volumeValue} {listing.unit || 'Kg'}</div>
                 </div>
               </div>
             </div>
@@ -168,7 +170,7 @@ export const BiddingView: React.FC<BiddingViewProps> = ({ listing, onBack, onSub
           <div id="bidding-curator-tip" className="bg-emerald-900/70 rounded-xl p-3 border border-emerald-700/60 flex items-start gap-2.5 text-xs text-emerald-100">
             <Sparkles className="w-4 h-4 text-amber-300 shrink-0 mt-0.5" />
             <div className="leading-relaxed text-[11px]">
-              <span className="font-bold text-amber-200">Tips Kurator Hubvest:</span> "Tawaran di kisaran <strong className="text-white">Rp 20.000</strong> memiliki tingkat keberhasilan <span className="text-emerald-300 font-bold">85%</span> untuk lot ini berdasarkan histori transaksi petani."
+              <span className="font-bold text-amber-200">Tips Kurator Hubvest:</span> "Tawaran di kisaran <strong className="text-white">Rp {basePrice.toLocaleString('id-ID')}</strong> memiliki tingkat keberhasilan <span className="text-emerald-300 font-bold">85%</span> untuk lot ini berdasarkan histori transaksi petani."
             </div>
           </div>
         </div>
@@ -217,10 +219,10 @@ export const BiddingView: React.FC<BiddingViewProps> = ({ listing, onBack, onSub
             </button>
             <button
               id="preset-pasar"
-              onClick={() => setOfferPrice(20000)}
+              onClick={() => setOfferPrice(basePrice)}
               className="py-1.5 rounded-lg border border-emerald-500 bg-emerald-50 text-emerald-800 transition-all text-center font-bold"
             >
-              Pasar (20k)
+              Pasar ({(basePrice / 1000).toFixed(0)}k)
             </button>
             <button
               id="preset-plus-5"
@@ -242,7 +244,7 @@ export const BiddingView: React.FC<BiddingViewProps> = ({ listing, onBack, onSub
           <div id="bidding-commitment-box" className="bg-amber-50 rounded-xl p-3 border border-amber-200 flex items-center justify-between text-xs">
             <div>
               <span className="text-slate-600 font-medium block">Total Komitmen Transaksi:</span>
-              <span className="text-[10px] text-slate-500">(500 kg x Rp {offerPrice.toLocaleString('id-ID')})</span>
+              <span className="text-[10px] text-slate-500">({volumeValue} {listing.unit || 'Kg'} x Rp {offerPrice.toLocaleString('id-ID')})</span>
             </div>
             <div className="text-right">
               <span className="text-base font-black text-amber-900 block">

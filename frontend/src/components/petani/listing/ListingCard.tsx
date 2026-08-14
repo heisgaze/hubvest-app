@@ -23,9 +23,7 @@ interface ListingCardProps {
 }
 
 export default function ListingCard({ listing }: ListingCardProps) {
-  const bidCount = useMemo(() => {
-    return bids.filter((b) => b.listingId === listing.id).length;
-  }, [listing.id]);
+  const bidCount = listing.bidCount || 0;
 
   const statusVariant = useMemo(() => {
     switch (listing.status) {
@@ -47,7 +45,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
       case "open":
         return "Aktif";
       case "locked":
-        return "Terkunci";
+        return "Terjual";
       case "completed":
         return "Selesai";
       case "cancelled":

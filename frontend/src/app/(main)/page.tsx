@@ -20,7 +20,7 @@ const chatMessages: any = {};
 
 export default async function DashboardPage() {
   const roleId = await getRoleCookie();
-  const isTengkulak = roleId === "c25594e8-7901-40ae-b202-da8d1512990d";
+  const isTengkulak = roleId === "t1";
 
   if (isTengkulak) {
     return <TengkulakApp />;

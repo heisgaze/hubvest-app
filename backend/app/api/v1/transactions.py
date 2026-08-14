@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 from ...db.database import get_db
 from ...db.models import Transaction, Review, User
@@ -18,13 +18,17 @@ def get_transaction(id: str, db: Session = Depends(get_db)):
     return transaction
 
 @router.get("/me/all", response_model=List[schemas.Transaction])
-def get_my_transactions(db: Session = Depends(get_db)):
+def get_my_transactions(request: Request, db: Session = Depends(get_db)):
     """
     Get all transactions where the current user is either seller or buyer.
-    (Mock implementation: returns for both 'u1' and 'u2' for demo purposes if not auth'd)
     """
-    # For now, we'll return all transactions so both mock users can see them
-    transactions = db.query(Transaction).order_by(Transaction.created_at.desc()).all()
+    user_id = request.headers.get("X-User-Id")
+    if not user_id:
+        return []
+        
+    transactions = db.query(Transaction).filter(
+        (Transaction.seller_id == user_id) | (Transaction.buyer_id == user_id)
+    ).order_by(Transaction.created_at.desc()).all()
     return transactions
 
 @router.post("/{id}/complete")

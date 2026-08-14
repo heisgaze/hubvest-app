@@ -10,7 +10,7 @@ import { formatRupiah, formatShortDate, getCommodityEmoji } from "@/lib/utils";
 export default async function ListingDetailPage({ params }: { params: { id: string } }) {
   const id = params.id;
   const roleId = await getRoleCookie();
-  const isTengkulak = roleId === "c25594e8-7901-40ae-b202-da8d1512990d";
+  const isTengkulak = roleId === "t1";
   
   const data = await fetchListing(id);
   if (!data) return null;
@@ -18,6 +18,19 @@ export default async function ListingDetailPage({ params }: { params: { id: stri
   const { listing, bids: listingBids } = data;
 
   if (!listing) return null;
+  const statusLabel = {
+    open: "Aktif",
+    locked: "Terjual",
+    completed: "Selesai",
+    cancelled: "Dibatalkan"
+  }[listing.status as string] || "Aktif";
+
+  const statusVariant = {
+    open: "active",
+    locked: "pending",
+    completed: "done",
+    cancelled: "done"
+  }[listing.status as string] || "active";
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
@@ -32,7 +45,7 @@ export default async function ListingDetailPage({ params }: { params: { id: stri
             {listing.grade && (
               <Badge variant={gradeToBadgeVariant(listing.grade)}>Grade {listing.grade}</Badge>
             )}
-            <Badge variant="active">Aktif</Badge>
+            <Badge variant={statusVariant as any}>{statusLabel}</Badge>
           </div>
           <h1 className="text-2xl font-bold text-white mb-1">
             {listing.commodity?.name}

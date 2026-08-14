@@ -37,7 +37,99 @@ export default function TengkulakApp() {
   const [screenView, setScreenView] = useState<ScreenView>({ type: 'TAB', tab: 'HOME' });
   const [currentLocation, setCurrentLocation] = useState('Brebes, Jawa Tengah');
 
-  const [commodities, setCommodities] = useState<Commodity[]>([]);
+  const [commodities, setCommodities] = useState<Commodity[]>([
+    {
+      id: 'c1',
+      name: 'Bawang Merah',
+      category: 'Sayuran',
+      price: 25000,
+      unit: 'Kg',
+      changePercent: 1.2,
+      isUp: true,
+      color: '#ef4444',
+      iconType: 'bawang',
+      iconBg: '#fee2e2',
+      sparkline: [24000, 24500, 24800, 25000],
+      marketPrices: [
+        { location: 'Pasar Induk Kramat Jati', price: 26000, updatedAt: 'Hari ini, 08:00' },
+        { location: 'Pasar Induk Cibitung', price: 25500, updatedAt: 'Hari ini, 07:30' }
+      ],
+      description: 'Bawang merah berkualitas tinggi dari Brebes.',
+      qualityGrade: 'Grade A'
+    },
+    {
+      id: 'c2',
+      name: 'Cabai Merah',
+      category: 'Sayuran',
+      price: 40000,
+      unit: 'Kg',
+      changePercent: -0.5,
+      isUp: false,
+      color: '#dc2626',
+      iconType: 'cabai',
+      iconBg: '#fef2f2',
+      sparkline: [42000, 41000, 40500, 40000],
+      marketPrices: [
+        { location: 'Pasar Induk Kramat Jati', price: 42000, updatedAt: 'Hari ini, 08:00' }
+      ],
+      description: 'Cabai merah besar segar, cocok untuk industri makanan.',
+      qualityGrade: 'Grade B'
+    },
+    {
+      id: 'c3',
+      name: 'Tomat',
+      category: 'Sayuran',
+      price: 8000,
+      unit: 'Kg',
+      changePercent: 2.4,
+      isUp: true,
+      color: '#f97316',
+      iconType: 'tomat',
+      iconBg: '#ffedd5',
+      sparkline: [7500, 7800, 7900, 8000],
+      marketPrices: [
+        { location: 'Pasar Induk Cibitung', price: 8500, updatedAt: 'Hari ini, 07:45' }
+      ],
+      description: 'Tomat segar pilihan langsung dari petani.',
+      qualityGrade: 'Grade A'
+    },
+    {
+      id: 'c4',
+      name: 'Bawang Putih',
+      category: 'Sayuran',
+      price: 30000,
+      unit: 'Kg',
+      changePercent: 0,
+      isUp: true,
+      color: '#94a3b8',
+      iconType: 'bawang',
+      iconBg: '#f1f5f9',
+      sparkline: [30000, 30000, 30000, 30000],
+      marketPrices: [
+        { location: 'Pasar Induk Kramat Jati', price: 31000, updatedAt: 'Hari ini, 06:00' }
+      ],
+      description: 'Bawang putih impor & lokal berkualitas.',
+      qualityGrade: 'Grade B'
+    },
+    {
+      id: 'c5',
+      name: 'Kentang',
+      category: 'Sayuran',
+      price: 15000,
+      unit: 'Kg',
+      changePercent: 1.5,
+      isUp: true,
+      color: '#eab308',
+      iconType: 'kentang',
+      iconBg: '#fef9c3',
+      sparkline: [14000, 14500, 14800, 15000],
+      marketPrices: [
+        { location: 'Pasar Induk Cibitung', price: 16000, updatedAt: 'Hari ini, 07:15' }
+      ],
+      description: 'Kentang Dieng ukuran besar, mulus.',
+      qualityGrade: 'Grade A'
+    }
+  ]);
   const [farmerListings, setFarmerListings] = useState<FarmerListing[]>([]);
   const [orders, setOrders] = useState<OrderItem[]>([]);
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
@@ -53,7 +145,7 @@ export default function TengkulakApp() {
         commodityPhoto: "https://images.unsplash.com/photo-1618512496248-a07fe83aa8cf?auto=format&fit=crop&q=80&w=800",
         location: l.location,
         distance: "12 km",
-        price: l.minPrice,
+        estimatedPrice: l.minPrice,
         volume: l.volume.toString(),
         unit: l.unit,
         rating: l.farmer.rating,
@@ -238,7 +330,7 @@ export default function TengkulakApp() {
 
   return (
     <MobileFrame>
-      <div id="app-root-frame" className="min-h-full flex flex-col bg-[#F8F9FA] relative">
+      <div id="app-root-frame" className="min-h-screen flex flex-col bg-[#F8F9FA] relative">
         {/* Render Header only when in TAB view */}
         {screenView.type === 'TAB' && (
           <Header
