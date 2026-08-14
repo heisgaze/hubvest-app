@@ -57,21 +57,21 @@ export default function ListingCard({ listing }: ListingCardProps) {
 
   return (
     <Link href={`/listing/${listing.id}`}>
-      <div className="card card-hover flex items-start gap-3 p-4 bg-white rounded-2xl shadow-card transition-all mb-4">
+      <div className="bg-white rounded-[26px] p-4 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-gray-100/90 flex items-start gap-3.5 mb-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md cursor-pointer select-none">
         {/* Placeholder Image */}
-        <div className="w-20 h-20 rounded-xl flex-shrink-0 flex items-center justify-center text-3xl" style={{ backgroundColor: '#F0F7F4' }}>
+        <div className="w-16 h-16 rounded-2xl flex-shrink-0 flex items-center justify-center text-3xl bg-[#F8F9FA] shadow-2xs border border-gray-100/50">
           {getCommodityEmoji(listing.commodity?.name)}
         </div>
 
         <div className="flex-1">
           <div className="flex justify-between items-start mb-1">
-            <h3 className="font-semibold text-gray-800 line-clamp-1">
+            <h3 className="font-bold text-[#12241A] text-lg leading-snug truncate">
               {listing.commodity?.name || 'Komoditas'}
             </h3>
             <Badge variant={statusVariant}>{statusLabel}</Badge>
           </div>
           
-          <p className="text-sm text-gray-500 mb-2">
+          <p className="text-xs font-medium text-gray-500 mb-2.5">
             {listing.volume} {listing.unit} • Panen: {formatShortDate(listing.harvestDate)}
           </p>
 
@@ -81,14 +81,14 @@ export default function ListingCard({ listing }: ListingCardProps) {
                 <Badge variant={gradeToBadgeVariant(listing.grade)}>Grade {listing.grade}</Badge>
               )}
               {bidCount > 0 && (
-                <span className="text-xs font-medium text-accent bg-green-50 px-2 py-1 rounded-full">
+                <span className="text-[11px] font-bold tracking-wide uppercase text-[#166534] bg-[#DCFCE7] px-3 py-1 rounded-full">
                   {bidCount} penawaran
                 </span>
               )}
             </div>
             
-            <p className="font-bold text-primary">
-              {formatRupiah(listing.minPrice)}<span className="text-xs font-normal text-gray-500">/{listing.unit}</span>
+            <p className="font-extrabold text-[#12241A]">
+              {formatRupiah(listing.minPrice)}<span className="text-xs font-normal text-gray-400">/{listing.unit}</span>
             </p>
           </div>
         </div>

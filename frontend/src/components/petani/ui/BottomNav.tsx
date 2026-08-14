@@ -5,16 +5,14 @@ import { usePathname } from "next/navigation";
 
 const tabs = [
   {
-    label: "Beranda",
+    label: "HOME",
     href: "/",
     icon: (active: boolean) => (
       <svg
-        width="24"
-        height="24"
+        className={`w-5 h-5 stroke-[2.2] ${active ? 'text-[#12241A]' : 'text-[#8E9B93]'}`}
         viewBox="0 0 24 24"
         fill="none"
-        stroke={active ? "#1B4332" : "#9CA3AF"}
-        strokeWidth="2"
+        stroke="currentColor"
         strokeLinecap="round"
         strokeLinejoin="round"
       >
@@ -24,16 +22,14 @@ const tabs = [
     ),
   },
   {
-    label: "Listing",
+    label: "LISTING",
     href: "/listing",
     icon: (active: boolean) => (
       <svg
-        width="24"
-        height="24"
+        className={`w-5 h-5 stroke-[2.2] ${active ? 'text-[#12241A]' : 'text-[#8E9B93]'}`}
         viewBox="0 0 24 24"
         fill="none"
-        stroke={active ? "#1B4332" : "#9CA3AF"}
-        strokeWidth="2"
+        stroke="currentColor"
         strokeLinecap="round"
         strokeLinejoin="round"
       >
@@ -45,17 +41,14 @@ const tabs = [
     ),
   },
   {
-    label: "Scan",
+    label: "SCAN",
     href: "/scan",
-    isCenter: true,
     icon: (active: boolean) => (
       <svg
-        width="28"
-        height="28"
+        className={`w-5 h-5 stroke-[2.2] ${active ? 'text-[#12241A]' : 'text-[#8E9B93]'}`}
         viewBox="0 0 24 24"
         fill="none"
-        stroke={active ? "#FFFFFF" : "#FFFFFF"}
-        strokeWidth="2"
+        stroke="currentColor"
         strokeLinecap="round"
         strokeLinejoin="round"
       >
@@ -65,16 +58,14 @@ const tabs = [
     ),
   },
   {
-    label: "Chat",
+    label: "CHAT",
     href: "/chat",
     icon: (active: boolean) => (
       <svg
-        width="24"
-        height="24"
+        className={`w-5 h-5 stroke-[2.2] ${active ? 'text-[#12241A]' : 'text-[#8E9B93]'}`}
         viewBox="0 0 24 24"
         fill="none"
-        stroke={active ? "#1B4332" : "#9CA3AF"}
-        strokeWidth="2"
+        stroke="currentColor"
         strokeLinecap="round"
         strokeLinejoin="round"
       >
@@ -83,16 +74,14 @@ const tabs = [
     ),
   },
   {
-    label: "Profil",
+    label: "PROFIL",
     href: "/profile",
     icon: (active: boolean) => (
       <svg
-        width="24"
-        height="24"
+        className={`w-5 h-5 stroke-[2.2] ${active ? 'text-[#12241A]' : 'text-[#8E9B93]'}`}
         viewBox="0 0 24 24"
         fill="none"
-        stroke={active ? "#1B4332" : "#9CA3AF"}
-        strokeWidth="2"
+        stroke="currentColor"
         strokeLinecap="round"
         strokeLinejoin="round"
       >
@@ -112,22 +101,47 @@ export default function BottomNav() {
   };
 
   return (
-    <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md z-50 bg-white shadow-nav border-t border-gray-100">
-      <div className="max-w-md mx-auto flex items-center justify-around px-2 pb-[env(safe-area-inset-bottom)]">
+    <nav className="absolute bottom-2 left-0 right-0 z-30 px-3 pb-1 pt-1 pointer-events-none">
+      <div className="bg-white/95 backdrop-blur-md rounded-[28px] p-2 flex items-center justify-around shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-slate-200/80 pointer-events-auto">
         {tabs.map((tab) => {
           const active = isActive(tab.href);
 
-          if (tab.isCenter) {
+          const isScan = tab.href === "/scan";
+
+          if (isScan) {
             return (
               <Link
                 key={tab.href}
                 href={tab.href}
-                className="flex flex-col items-center -mt-6"
+                className="flex flex-col items-center justify-center flex-1 py-0.5 group transition-all duration-200"
               >
-                <div className="w-14 h-14 rounded-full gradient-primary flex items-center justify-center shadow-float transition-transform duration-200 active:scale-95">
-                  {tab.icon(active)}
+                {/* Protruding Scan Button Wrapper occupying exact same height as other icons (h-8) */}
+                <div className="h-8 flex items-end justify-center relative w-full">
+                  <div
+                    className={`absolute bottom-0 w-[52px] h-[52px] rounded-full flex items-center justify-center transition-all duration-200 shadow-[0_4px_20px_rgba(42,71,54,0.3)] bg-[#2A4736] text-white group-hover:bg-[#1f3729] ${
+                      active ? 'scale-105' : ''
+                    }`}
+                  >
+                    <svg
+                      className="w-6 h-6 stroke-[2.5] text-white"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" />
+                      <circle cx="12" cy="13" r="4" />
+                    </svg>
+                  </div>
                 </div>
-                <span className="text-[10px] mt-1 font-semibold text-primary">
+
+                {/* Label */}
+                <span
+                  className={`text-[10px] font-bold tracking-wider mt-0.5 transition-colors ${
+                    active ? 'text-[#12241A]' : 'text-[#8E9B93]'
+                  }`}
+                >
                   {tab.label}
                 </span>
               </Link>
@@ -138,19 +152,27 @@ export default function BottomNav() {
             <Link
               key={tab.href}
               href={tab.href}
-              className="flex flex-col items-center py-2 px-3 min-w-[56px] transition-colors duration-200"
+              className="flex flex-col items-center justify-center flex-1 py-0.5 group transition-all duration-200"
             >
-              {tab.icon(active)}
+              {/* Active Icon Background Capsule */}
+              <div
+                className={`w-12 h-8 rounded-2xl flex items-center justify-center transition-all duration-200 ${
+                  active
+                    ? 'bg-[#E2F4EB] scale-105 shadow-xs'
+                    : 'group-hover:bg-gray-50'
+                }`}
+              >
+                {tab.icon(active)}
+              </div>
+
+              {/* Label */}
               <span
-                className={`text-[10px] mt-1 font-medium transition-colors duration-200 ${
-                  active ? "text-primary font-semibold" : "text-text-muted"
+                className={`text-[10px] font-bold tracking-wider mt-0.5 transition-colors ${
+                  active ? 'text-[#12241A]' : 'text-[#8E9B93]'
                 }`}
               >
                 {tab.label}
               </span>
-              {active && (
-                <div className="w-1 h-1 rounded-full bg-primary mt-0.5" />
-              )}
             </Link>
           );
         })}
@@ -158,3 +180,4 @@ export default function BottomNav() {
     </nav>
   );
 }
+
