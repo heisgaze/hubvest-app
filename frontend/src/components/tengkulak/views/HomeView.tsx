@@ -10,7 +10,6 @@ interface HomeViewProps {
   onLihatSemuaClick: () => void;
   onCommodityClick: (c: Commodity) => void;
   onFarmerClick: (f: FarmerListing) => void;
-  onCatatPanenClick: () => void;
 }
 
 export const HomeView: React.FC<HomeViewProps> = ({
@@ -19,7 +18,6 @@ export const HomeView: React.FC<HomeViewProps> = ({
   onLihatSemuaClick,
   onCommodityClick,
   onFarmerClick,
-  onCatatPanenClick,
 }) => {
   return (
     <div className="pt-2 pb-28 space-y-6 animate-in fade-in duration-200 relative">
@@ -82,18 +80,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
         </div>
       </section>
 
-      {/* Floating Action Button: "Catat Panen" */}
-      <div className="absolute bottom-20 right-4 z-20">
-        <button
-          onClick={onCatatPanenClick}
-          className="bg-[#2A4736] hover:bg-[#1e3427] text-white px-4 py-3 rounded-full font-bold text-xs shadow-[0_8px_25px_rgba(42,71,54,0.35)] flex items-center gap-2 transition-all duration-200 active:scale-95 group"
-        >
-          <div className="w-4 h-4 rounded-md border-2 border-white/80 flex items-center justify-center text-white">
-            <Plus className="w-3 h-3 stroke-[3]" />
-          </div>
-          <span className="tracking-tight">Catat Panen</span>
-        </button>
-      </div>
+
     </div>
   );
 };

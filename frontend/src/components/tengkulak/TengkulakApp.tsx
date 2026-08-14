@@ -27,7 +27,6 @@ import { TransactionDetailView } from "@/components/tengkulak/views/TransactionD
 
 import { fetchListings, submitBid, fetchMyBids, fetchMyTransactions, cancelTransaction } from "@/lib/api";
 
-import { CatatPanenModal } from "@/components/tengkulak/modals/CatatPanenModal";
 import { CommodityDetailModal } from "@/components/tengkulak/modals/CommodityDetailModal";
 import { FarmerDetailModal } from "@/components/tengkulak/modals/FarmerDetailModal";
 import { LocationModal } from "@/components/tengkulak/modals/LocationModal";
@@ -207,17 +206,12 @@ export default function TengkulakApp() {
   }, []);
 
   // Modals
-  const [isCatatPanenOpen, setIsCatatPanenOpen] = useState(false);
   const [selectedCommodity, setSelectedCommodity] = useState<Commodity | null>(null);
   const [selectedFarmer, setSelectedFarmer] = useState<FarmerListing | null>(null);
   const [isLocationOpen, setIsLocationOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 
   // Handlers
-  const handleSaveHarvest = (newListing: FarmerListing) => {
-    setFarmerListings([newListing, ...farmerListings]);
-  };
-
   const handleOpenBidding = (farmer: FarmerListing) => {
     setSelectedFarmer(null);
     const prevTab = screenView.type === 'TAB' ? screenView.tab : 'HOME';
@@ -352,7 +346,6 @@ export default function TengkulakApp() {
               onLihatSemuaClick={() => setScreenView({ type: 'TAB', tab: 'MARKET' })}
               onCommodityClick={(c) => setSelectedCommodity(c)}
               onFarmerClick={(f) => handleOpenBidding(f)}
-              onCatatPanenClick={() => setIsCatatPanenOpen(true)}
             />
           )}
 
@@ -437,12 +430,6 @@ export default function TengkulakApp() {
         )}
 
         {/* Global Modals */}
-        <CatatPanenModal
-          isOpen={isCatatPanenOpen}
-          onClose={() => setIsCatatPanenOpen(false)}
-          onSave={handleSaveHarvest}
-        />
-
         <CommodityDetailModal
           commodity={selectedCommodity}
           onClose={() => setSelectedCommodity(null)}
