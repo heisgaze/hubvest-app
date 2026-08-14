@@ -12,7 +12,20 @@ export const CatatPanenModal: React.FC<CatatPanenModalProps> = ({ isOpen, onClos
   const [commodity, setCommodity] = useState('Bawang Merah');
   const [amount, setAmount] = useState('1.5');
   const [unit, setUnit] = useState<'Ton' | 'Kg'>('Ton');
-  const [targetPrice, setTargetPrice] = useState('29000');
+  
+  // Auto-fill price based on commodity
+  const targetPrice = React.useMemo(() => {
+    switch (commodity) {
+      case 'Bawang Merah': return '25000';
+      case 'Cabai Merah Keriting': return '40000';
+      case 'Cabai Rawit Merah': return '45000';
+      case 'Beras Medium IR64': return '12000';
+      case 'Jagung Pipil Dry': return '6000';
+      case 'Tomat Sayur Fresh': return '8000';
+      default: return '25000';
+    }
+  }, [commodity]);
+
   const [location, setLocation] = useState('Wanasari, Brebes');
   const [description, setDescription] = useState('Panen kualitas super petik baru. Siap muat.');
 
@@ -126,18 +139,18 @@ export const CatatPanenModal: React.FC<CatatPanenModalProps> = ({ isOpen, onClos
           {/* Target Price */}
           <div>
             <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
-              Ekspektasi Harga (Rp/kg)
+              Harga Referensi Pasar (Rp/kg)
             </label>
             <div className="relative">
               <input
                 type="number"
                 value={targetPrice}
-                onChange={(e) => setTargetPrice(e.target.value)}
-                placeholder="28500"
-                className="w-full bg-gray-50 border border-gray-200 rounded-2xl pl-10 pr-4 py-3 text-sm font-bold text-[#12241A] focus:outline-hidden focus:ring-2 focus:ring-emerald-600"
+                readOnly
+                className="w-full bg-gray-200 border border-gray-300 rounded-2xl pl-10 pr-4 py-3 text-sm font-bold text-gray-500 cursor-not-allowed"
               />
               <DollarSign className="w-4 h-4 text-gray-400 absolute left-3.5 top-3.5" />
             </div>
+            <p className="text-[10px] text-gray-500 mt-1">*Harga dikunci berdasarkan referensi pasar real-time</p>
           </div>
 
           {/* Location */}
