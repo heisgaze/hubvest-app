@@ -27,7 +27,7 @@ export default function OtherProfilePage() {
   const user = users.find(u => u.id === userId) || users[1];
   
   const userReviews = reviews.filter(r => r.targetId === user.id);
-  const userListings = listings.filter(l => l.farmerId === user.id && l.status === "active");
+  const userListings = listings.filter(l => l.farmerId === user.id && l.status === "open");
 
   return (
     <div className="min-h-screen bg-surface-bg pb-24 animate-fade-in relative">

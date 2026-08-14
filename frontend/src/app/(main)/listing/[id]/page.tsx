@@ -108,7 +108,7 @@ export default async function ListingDetailPage({ params }: { params: { id: stri
         </div>
       </div>
       
-      {isTengkulak && listing.status === "active" && (
+      {isTengkulak && listing.status === "open" && (
         <BidForm listingId={listing.id} minPrice={listing.minPrice} />
       )}
     </div>

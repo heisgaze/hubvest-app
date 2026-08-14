@@ -81,7 +81,7 @@ export interface Listing {
   grade?: GradeLevel;
   description: string;
   images: string[];
-  status: "active" | "negotiating" | "sold" | "expired";
+  status: "open" | "locked" | "completed" | "cancelled";
   bidCount: number;
   createdAt: string;
 }

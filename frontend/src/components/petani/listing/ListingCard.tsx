@@ -30,14 +30,13 @@ export default function ListingCard({ listing }: ListingCardProps) {
   const statusVariant = useMemo(() => {
     switch (listing.status) {
       case "open":
-      case "active":
         return "active";
       case "locked":
-      case "negotiating":
         return "pending";
       case "completed":
-      case "sold":
         return "done";
+      case "cancelled":
+        return "done"; // or whatever variant looks best for cancelled
       default:
         return "active";
     }
@@ -46,14 +45,13 @@ export default function ListingCard({ listing }: ListingCardProps) {
   const statusLabel = useMemo(() => {
     switch (listing.status) {
       case "open":
-      case "active":
         return "Aktif";
       case "locked":
-      case "negotiating":
         return "Terkunci";
       case "completed":
-      case "sold":
         return "Selesai";
+      case "cancelled":
+        return "Dibatalkan";
       default:
         return "Aktif";
     }
