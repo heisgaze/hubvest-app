@@ -6,22 +6,26 @@ import PFICalculator from "./PFICalculator";
 import MarketPriceSection from "./MarketPriceSection";
 
 export default function DashboardInteractive({ initialMarketPrices }: { initialMarketPrices: MarketPrice[] }) {
-  const [selectedCommodity, setSelectedCommodity] = useState<string>("Semua");
+  // Get unique commodity names and locations for filter chips
+  const commodities = Array.from(new Set(initialMarketPrices.map(p => p.commodity.name)));
+  // Ensure we have at least one valid commodity if not empty
+  const defaultCommodity = commodities.length > 0 ? commodities[0] : "";
+  
+  const [selectedCommodity, setSelectedCommodity] = useState<string>(defaultCommodity);
   const [selectedLocation, setSelectedLocation] = useState<string>("Semua");
 
-  // Get unique commodity names and locations for filter chips
-  const commodities = ["Semua", ...Array.from(new Set(initialMarketPrices.map(p => p.commodity.name)))];
   const locations = ["Semua", "Brebes", "Bandung", "Malang", "Wonosobo", "Garut", "Nganjuk", "Kediri", "Enrekang", "Bima", "Agam"];
 
   // Filter prices based on selection
   const filteredPrices = initialMarketPrices.filter(p => {
-    const matchCommodity = selectedCommodity === "Semua" || p.commodity.name === selectedCommodity;
+    const matchCommodity = p.commodity.name === selectedCommodity;
     const matchLocation = selectedLocation === "Semua" || p.location === selectedLocation;
     return matchCommodity && matchLocation;
   });
 
   // If a specific commodity is selected, set its consumer price as the default for PFI
-  const defaultMarketPrice = selectedCommodity !== "Semua" && filteredPrices.length > 0 
+  // If a specific commodity is selected, set its consumer price as the default for PFI
+  const defaultMarketPrice = filteredPrices.length > 0 
     ? filteredPrices[0].consumerPrice 
     : undefined;
 
