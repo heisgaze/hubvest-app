@@ -29,7 +29,7 @@ export async function createListingAction(formData: FormData) {
     unit: formData.get("unit"),
     price: parseFloat(formData.get("price") as string),
     location: formData.get("location"),
-    grade: "B",
+    grade: formData.get("grade") as string || "B",
     description: formData.get("description"),
   };
 

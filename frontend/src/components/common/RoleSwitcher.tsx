@@ -17,6 +17,7 @@ export default function RoleSwitcher({ currentRoleId }: { currentRoleId: string 
   const handleSwitch = () => {
     startTransition(() => {
       setRoleCookie(targetId);
+      window.location.href = "/";
     });
   };
 

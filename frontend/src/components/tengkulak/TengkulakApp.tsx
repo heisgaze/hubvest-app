@@ -20,12 +20,12 @@ import { MarketView } from "@/components/tengkulak/views/MarketView";
 import { OrdersView } from "@/components/tengkulak/views/OrdersView";
 import { ProfileView } from "@/components/tengkulak/views/ProfileView";
 
-import { fetchListings, submitBid } from "@/lib/api";
-
+import { ReviewView } from "@/components/tengkulak/views/ReviewView";
 import { BiddingView } from "@/components/tengkulak/views/BiddingView";
 import { ReceiptView } from "@/components/tengkulak/views/ReceiptView";
 import { TransactionDetailView } from "@/components/tengkulak/views/TransactionDetailView";
-import { ReviewView } from "@/components/tengkulak/views/ReviewView";
+
+import { fetchListings, submitBid, fetchMyBids, fetchMyTransactions, cancelTransaction } from "@/lib/api";
 
 import { CatatPanenModal } from "@/components/tengkulak/modals/CatatPanenModal";
 import { CommodityDetailModal } from "@/components/tengkulak/modals/CommodityDetailModal";
@@ -70,6 +70,48 @@ export default function TengkulakApp() {
       }));
       setFarmerListings(mapped as any);
     });
+
+    const loadOrders = async () => {
+      const myBids = await fetchMyBids();
+      const myTransactions = await fetchMyTransactions();
+
+      const mappedBids = myBids.map((b: any) => ({
+        id: b.id,
+        farmerName: "Petani", // Hardcoded for now since mock backend might not return deep relations
+        farmerPhoto: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=250",
+        commodityName: "Komoditas",
+        quantity: "100 Kg", // Approximation since bid doesn't store volume directly, it's on listing
+        offeredPrice: b.amount,
+        totalPrice: b.amount * 100,
+        status: b.status === "pending" ? "Menunggu Konfirmasi" : b.status === "rejected" ? "Dibatalkan" : "Selesai",
+        date: "Hari ini",
+        location: "Wanasari, Brebes",
+        note: "Menunggu petani menyetujui tawaran",
+        buyerName: "Budi Santoso",
+        buyerRole: "TENGKULAK PREMIUM",
+        buyerVehicle: "Truk Engkel • B 9921 KIZ",
+      }));
+
+      const mappedTrans = myTransactions.map((t: any) => ({
+        id: t.id,
+        farmerName: t.farmer?.name || "Petani",
+        farmerPhoto: t.farmer?.avatar || "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=250",
+        commodityName: t.commodity?.name || "Sayuran",
+        quantity: `${t.volume} Kg`,
+        offeredPrice: t.agreedPrice,
+        totalPrice: t.agreedPrice * t.volume,
+        status: t.status === "waiting_pickup" ? "Menunggu Pickup" : "Selesai",
+        date: "Hari ini",
+        location: t.pickupLocation,
+        note: "Transaksi telah disetujui",
+        buyerName: "Budi Santoso",
+        buyerRole: "TENGKULAK PREMIUM",
+        buyerVehicle: "Truk Engkel • B 9921 KIZ",
+      }));
+
+      setOrders([...mappedTrans, ...mappedBids] as OrderItem[]);
+    };
+    loadOrders();
   }, []);
 
   // Modals
@@ -86,7 +128,8 @@ export default function TengkulakApp() {
 
   const handleOpenBidding = (farmer: FarmerListing) => {
     setSelectedFarmer(null);
-    setScreenView({ type: 'BIDDING', listing: farmer });
+    const prevTab = screenView.type === 'TAB' ? screenView.tab : 'HOME';
+    setScreenView({ type: 'BIDDING', listing: farmer, previousTab: prevTab });
   };
 
   const handleSubmitOffer = (farmer: FarmerListing, quantityStr: string, offerPrice: number) => {
@@ -121,9 +164,9 @@ export default function TengkulakApp() {
       return;
     }
 
-    // Add to orders
+    // Add to orders as pending bid
     const newOrder: OrderItem = {
-      id: receiptData.contractId,
+      id: `BID-${Date.now()}`,
       farmerName: 'Pak Slamet Rahardjo',
       farmerPhoto: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=250',
       commodityName: receiptData.commodityName,
@@ -131,10 +174,10 @@ export default function TengkulakApp() {
       quantity: `${receiptData.volumeKg} Kg`,
       offeredPrice: receiptData.finalPrice / receiptData.volumeKg,
       totalPrice: receiptData.finalPrice,
-      status: 'Menunggu Pickup',
+      status: 'Menunggu Konfirmasi',
       date: 'Hari ini',
       location: 'Wanasari, Brebes',
-      note: 'Konfirmasi Digital Handshake Selesai',
+      note: 'Penawaran berhasil dikirim. Menunggu persetujuan petani.',
       buyerName: 'Budi Santoso',
       buyerRole: 'TENGKULAK PREMIUM',
       buyerVehicle: 'Truk Engkel • B 9921 KIZ',
@@ -146,7 +189,7 @@ export default function TengkulakApp() {
     const newNotif: NotificationItem = {
       id: `notif-${Date.now()}`,
       title: 'Tawaran Terkirim! 🎉',
-      message: `Tawaran Anda sebesar Rp ${(receiptData.finalPrice / receiptData.volumeKg).toLocaleString('id-ID')} untuk lot ini berhasil dikirim ke petani.`,
+      message: `Tawaran Anda sebesar Rp ${(receiptData.finalPrice / receiptData.volumeKg).toLocaleString('id-ID')} berhasil dikirim ke petani.`,
       time: 'Baru saja',
       read: false,
       type: 'offer',
@@ -154,8 +197,8 @@ export default function TengkulakApp() {
 
     setNotifications([newNotif, ...notifications]);
 
-    // Go to Receipt screen
-    setScreenView({ type: 'RECEIPT', receipt: receiptData });
+    // Go to Orders screen instead of Receipt
+    setScreenView({ type: 'TAB', tab: 'ORDERS' });
   };
 
   const handleConfirmPickupAndReview = (order: OrderItem) => {
@@ -170,6 +213,19 @@ export default function TengkulakApp() {
   const handleReviewSubmitted = (rating: number, comment: string) => {
     alert(`Terima kasih! Ulasan ${rating} bintang berhasil dikirim ke mitra pertanian.`);
     setScreenView({ type: 'TAB', tab: 'ORDERS' });
+  };
+  
+  const handleCancelTransaction = async (order: OrderItem) => {
+    const res = await cancelTransaction(order.id);
+    if (res.success) {
+      alert("Transaksi berhasil dibatalkan.");
+      setOrders((prev) =>
+        prev.map((o) => (o.id === order.id ? { ...o, status: 'Dibatalkan' } : o))
+      );
+      setScreenView({ type: 'TAB', tab: 'ORDERS' });
+    } else {
+      alert("Gagal membatalkan transaksi: " + res.message);
+    }
   };
 
   const unreadNotifCount = notifications.filter((n) => !n.read).length;
@@ -242,7 +298,7 @@ export default function TengkulakApp() {
           {screenView.type === 'BIDDING' && (
             <BiddingView
               listing={screenView.listing}
-              onBack={() => setScreenView({ type: 'TAB', tab: 'HOME' })}
+              onBack={() => setScreenView({ type: 'TAB', tab: screenView.previousTab || 'HOME' })}
               onSubmitOffer={handleBiddingComplete}
             />
           )}
@@ -266,6 +322,7 @@ export default function TengkulakApp() {
               order={screenView.order}
               onBack={() => setScreenView({ type: 'TAB', tab: 'ORDERS' })}
               onConfirmPickup={() => handleConfirmPickupAndReview(screenView.order)}
+              onCancel={() => handleCancelTransaction(screenView.order)}
             />
           )}
 

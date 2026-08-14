@@ -10,9 +10,9 @@ export default function ListingView({ initialListings }: { initialListings: List
 
   const filteredListings = initialListings.filter((listing: Listing) => {
     if (activeFilter === "Semua") return true;
-    if (activeFilter === "Aktif") return listing.status === "active";
-    if (activeFilter === "Negosiasi") return listing.status === "negotiating";
-    if (activeFilter === "Terjual") return listing.status === "sold";
+    if (activeFilter === "Aktif") return listing.status === "open";
+    if (activeFilter === "Negosiasi") return listing.status === "locked";
+    if (activeFilter === "Terjual") return listing.status === "completed";
     return true;
   });
 

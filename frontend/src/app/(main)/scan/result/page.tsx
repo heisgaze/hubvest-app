@@ -19,9 +19,9 @@ export default async function ScanResultPage() {
         )}
         
         <div className="mt-8 flex flex-col gap-3">
-          <Link href="/listing/create">
-            <button className="w-full btn-primary">
-              Simpan ke Listing
+          <Link href={`/listing/create?grade=${result?.grade || 'B'}&commodity=${encodeURIComponent(result?.commodityName || '')}`} className="block w-full">
+            <button className="w-full btn-primary text-sm shadow-md py-3.5">
+              Simpan Sertifikat & Buat Listing Baru
             </button>
           </Link>
           <Link href="/scan">

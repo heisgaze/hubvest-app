@@ -257,9 +257,80 @@ export async function acceptBid(bidId: string, userId: string = "u1"): Promise<{
   }
 }
 
+export async function rejectBid(bidId: string, userId: string = "u1"): Promise<{ success: boolean, message?: string }> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/bids/${bidId}/reject`, {
+      method: "POST",
+      headers: getHeaders(userId)
+    });
+    
+    const data = await res.json();
+    
+    if (!res.ok) {
+      return { success: false, message: data.detail || "Gagal menolak tawaran" };
+    }
+    
+    return { success: true };
+  } catch (error) {
+    console.error("rejectBid error:", error);
+    return { success: false, message: "Terjadi kesalahan server" };
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Transactions
 // ---------------------------------------------------------------------------
+
+export async function fetchMyBids(userId: string = "t1"): Promise<Bid[]> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/bids/me/bids`, { cache: "no-store", headers: getHeaders(userId) });
+    if (!res.ok) return [];
+    return await res.json();
+  } catch (error) {
+    console.error("fetchMyBids error:", error);
+    return [];
+  }
+}
+
+export async function fetchIncomingBids(userId: string = "u1"): Promise<Bid[]> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/bids/incoming/bids`, { cache: "no-store", headers: getHeaders(userId) });
+    if (!res.ok) return [];
+    return await res.json();
+  } catch (error) {
+    console.error("fetchIncomingBids error:", error);
+    return [];
+  }
+}
+
+export async function fetchMyTransactions(userId: string = "u1"): Promise<Transaction[]> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/transactions/me/all`, { cache: "no-store", headers: getHeaders(userId) });
+    if (!res.ok) return [];
+    const items = await res.json();
+    return items.map((item: any) => ({
+      id: item.id,
+      listingId: item.listing_id,
+      listing: item.listing,
+      farmerId: item.seller_id,
+      farmer: item.seller,
+      tengkulakId: item.buyer_id,
+      tengkulak: item.buyer,
+      commodity: item.listing?.commodity || { id: "c1", name: "Bawang Merah", image: "", unit: "kg", category: "" },
+      volume: item.listing?.quantity || 0,
+      unit: item.listing?.unit || "kg",
+      agreedPrice: item.final_price,
+      pickupDate: item.created_at,
+      pickupLocation: item.meeting_address || "Lokasi Petani",
+      status: item.status,
+      contractNumber: item.id.substring(0, 8),
+      timeline: []
+    }));
+  } catch (error) {
+    console.error("fetchMyTransactions error:", error);
+    return [];
+  }
+}
 
 export async function completeTransaction(transactionId: string, userId: string = "u1"): Promise<{ success: boolean, message?: string }> {
   try {
@@ -276,6 +347,25 @@ export async function completeTransaction(transactionId: string, userId: string 
     return { success: true };
   } catch (error) {
     console.error("completeTransaction error:", error);
+    return { success: false, message: "Terjadi kesalahan server" };
+  }
+}
+
+export async function cancelTransaction(transactionId: string, userId: string = "u1"): Promise<{ success: boolean, message?: string }> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/transactions/${transactionId}/cancel`, {
+      method: "POST",
+      headers: getHeaders(userId)
+    });
+    
+    if (!res.ok) {
+      const data = await res.json();
+      return { success: false, message: data.detail || "Gagal membatalkan transaksi" };
+    }
+    
+    return { success: true };
+  } catch (error) {
+    console.error("cancelTransaction error:", error);
     return { success: false, message: "Terjadi kesalahan server" };
   }
 }

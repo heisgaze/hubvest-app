@@ -12,7 +12,10 @@ def get_listings(status: str = "open", db: Session = Depends(get_db)):
     """
     Get all active harvest listings.
     """
-    listings = db.query(Listing).filter(Listing.status == status).all()
+    if status == "all":
+        listings = db.query(Listing).all()
+    else:
+        listings = db.query(Listing).filter(Listing.status == status).all()
     return listings
 
 @router.post("/", response_model=schemas.Listing)

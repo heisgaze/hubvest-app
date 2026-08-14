@@ -4,7 +4,7 @@ import Link from "next/link";
 import ListingView from "./ListingView";
 
 export default async function ListingIndexPage() {
-  const listings = await fetchListings();
+  const listings = await fetchListings("all");
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">

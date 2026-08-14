@@ -6,7 +6,7 @@ import StarRating from "@/components/petani/ui/StarRating";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { acceptBid } from "@/lib/api";
+import { acceptBid, rejectBid } from "@/lib/api";
 
 interface BidCardProps {
   bid: Bid;
@@ -15,6 +15,8 @@ interface BidCardProps {
 export default function BidCard({ bid }: BidCardProps) {
   const router = useRouter();
   const [isAccepting, setIsAccepting] = useState(false);
+  const [isRejecting, setIsRejecting] = useState(false);
+  const [isHidden, setIsHidden] = useState(false);
 
   const handleAcceptBid = async () => {
     if (!confirm(`Terima tawaran ${formatRupiah(bid.price)} dari ${bid.tengkulak?.name}?`)) return;
@@ -37,9 +39,31 @@ export default function BidCard({ bid }: BidCardProps) {
     }
   };
 
+  const handleRejectBid = async () => {
+    if (!confirm(`Tolak tawaran ${formatRupiah(bid.price)} dari ${bid.tengkulak?.name}?`)) return;
+    
+    setIsRejecting(true);
+    try {
+      const res = await rejectBid(bid.id);
+      
+      if (!res.success) {
+        throw new Error(res.message);
+      }
+
+      setIsHidden(true);
+    } catch (error: any) {
+      console.error(error);
+      alert(error.message || "Terjadi kesalahan saat menolak tawaran.");
+    } finally {
+      setIsRejecting(false);
+    }
+  };
+
   const initials = bid.tengkulak?.name
     ? bid.tengkulak.name.split(' ').map(n => n[0]).join('').substring(0, 2)
     : 'T';
+
+  if (isHidden) return null;
 
   return (
     <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 mb-3 animate-slide-up">
@@ -78,12 +102,16 @@ export default function BidCard({ bid }: BidCardProps) {
       </div>
 
       <div className="flex gap-2">
-        <button className="flex-1 py-2 px-4 rounded-xl border border-primary text-primary font-medium text-sm hover:bg-gray-50 transition-colors">
-          Chat
+        <button 
+          onClick={handleRejectBid}
+          disabled={isRejecting || isAccepting}
+          className="flex-1 py-2 px-4 rounded-xl border border-red-500 text-red-500 font-medium text-sm hover:bg-red-50 transition-colors disabled:opacity-50"
+        >
+          {isRejecting ? "Memproses..." : "Tolak"}
         </button>
         <button 
           onClick={handleAcceptBid}
-          disabled={isAccepting}
+          disabled={isAccepting || isRejecting}
           className="flex-1 py-2 px-4 rounded-xl bg-primary text-white font-medium text-sm hover:bg-primary-light transition-colors shadow-sm disabled:opacity-50"
         >
           {isAccepting ? "Memproses..." : "Terima"}

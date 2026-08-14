@@ -29,10 +29,13 @@ export default function ListingCard({ listing }: ListingCardProps) {
 
   const statusVariant = useMemo(() => {
     switch (listing.status) {
+      case "open":
       case "active":
         return "active";
+      case "locked":
       case "negotiating":
         return "pending";
+      case "completed":
       case "sold":
         return "done";
       default:
@@ -42,12 +45,15 @@ export default function ListingCard({ listing }: ListingCardProps) {
 
   const statusLabel = useMemo(() => {
     switch (listing.status) {
+      case "open":
       case "active":
         return "Aktif";
+      case "locked":
       case "negotiating":
-        return "Negosiasi";
+        return "Terkunci";
+      case "completed":
       case "sold":
-        return "Terjual";
+        return "Selesai";
       default:
         return "Aktif";
     }

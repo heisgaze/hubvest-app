@@ -116,3 +116,39 @@ def accept_bid(bid_id: str, db: Session = Depends(get_db)):
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/{bid_id}/reject")
+def reject_bid(bid_id: str, db: Session = Depends(get_db)):
+    """
+    Reject a bid (Petani).
+    """
+    bid = db.query(Bid).filter(Bid.id == bid_id).first()
+    if not bid:
+        raise HTTPException(status_code=404, detail="Bid not found")
+        
+    bid.status = "rejected"
+    db.commit()
+    
+    return {"success": True, "message": "Bid rejected"}
+
+@router.get("/me/bids", response_model=List[schemas.Bid])
+def get_my_bids(db: Session = Depends(get_db)):
+    """
+    Get all bids made by the current Tengkulak.
+    (Mock implementation: returns all bids by user 'u2')
+    """
+    # Assuming 'u2' is our mock Tengkulak
+    bids = db.query(Bid).filter(Bid.bidder_id == "u2").order_by(Bid.created_at.desc()).all()
+    return bids
+
+@router.get("/incoming/bids", response_model=List[schemas.Bid])
+def get_incoming_bids(db: Session = Depends(get_db)):
+    """
+    Get all incoming bids for listings owned by the current Petani.
+    (Mock implementation: returns bids for listings owned by 'u1')
+    """
+    # Assuming 'u1' is our mock Petani
+    bids = db.query(Bid).join(Listing, Bid.listing_id == Listing.id).filter(
+        Listing.seller_id == "u1"
+    ).order_by(Bid.created_at.desc()).all()
+    return bids

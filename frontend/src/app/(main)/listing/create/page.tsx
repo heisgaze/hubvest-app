@@ -9,11 +9,11 @@ import HeaderBar from "@/components/petani/ui/HeaderBar";
 const currentUser = { id: "", name: "Pengguna", role: "farmer", avatar: "", location: "", rating: 0, totalTransactions: 0, joinedDate: "", verified: false };
 const users: any[] = [];
 const commodities = [
-  { id: "c1", name: "Bawang Merah" },
-  { id: "c2", name: "Cabai Merah" },
-  { id: "c3", name: "Tomat" },
-  { id: "c4", name: "Bawang Putih" },
-  { id: "c5", name: "Kentang" }
+  { id: "c1", name: "Bawang Merah", price: 25000 },
+  { id: "c2", name: "Cabai Merah", price: 40000 },
+  { id: "c3", name: "Tomat", price: 8000 },
+  { id: "c4", name: "Bawang Putih", price: 30000 },
+  { id: "c5", name: "Kentang", price: 15000 }
 ];
 const marketPrices: any[] = [];
 const listings: any[] = [];
@@ -23,9 +23,18 @@ const reviews: any[] = [];
 const chatPreviews: any[] = [];
 const chatMessages: any = {};
 
-export default function CreateListingPage() {
+import { useState, useEffect } from "react";
+
+export default function CreateListingPage({ searchParams }: { searchParams: { grade?: string, commodity?: string } }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  
+  const defaultCommodityId = searchParams.commodity 
+    ? commodities.find(c => c.name.toLowerCase() === searchParams.commodity?.toLowerCase())?.id || ""
+    : "";
+    
+  const [selectedCommodity, setSelectedCommodity] = useState<string>(defaultCommodityId);
+  const selectedPrice = commodities.find(c => c.id === selectedCommodity)?.price || "";
 
   const formAction = async (formData: FormData) => {
     startTransition(async () => {
@@ -57,9 +66,17 @@ export default function CreateListingPage() {
 
         {/* Form Fields */}
         <div className="space-y-4">
+          <input type="hidden" name="grade" value={searchParams.grade || 'B'} />
+          
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">Komoditas</label>
-            <select name="commodity" className="w-full bg-white rounded-xl border border-gray-200 px-4 py-3 text-gray-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none" required>
+            <select 
+              name="commodity" 
+              value={selectedCommodity}
+              onChange={(e) => setSelectedCommodity(e.target.value)}
+              className="w-full bg-white rounded-xl border border-gray-200 px-4 py-3 text-gray-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none" 
+              required
+            >
               <option value="">Pilih Komoditas...</option>
               {commodities.map(c => (
                 <option key={c.id} value={c.id}>{c.name}</option>
@@ -92,13 +109,21 @@ export default function CreateListingPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Harga Minimum (Rp / Satuan)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Harga Referensi (Rp / Satuan)</label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                 <span className="text-gray-500 font-medium">Rp</span>
               </div>
-              <input name="price" type="number" placeholder="0" className="w-full bg-white rounded-xl border border-gray-200 pl-12 pr-4 py-3 text-gray-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" required min="100" />
+              <input 
+                name="price" 
+                type="number" 
+                value={selectedPrice} 
+                readOnly
+                className="w-full bg-gray-100 rounded-xl border border-gray-200 pl-12 pr-4 py-3 text-gray-600 focus:outline-none cursor-not-allowed" 
+                required 
+              />
             </div>
+            <p className="text-[10px] text-gray-500 mt-1">*Harga dikunci berdasarkan referensi pasar real-time</p>
           </div>
 
           <div>

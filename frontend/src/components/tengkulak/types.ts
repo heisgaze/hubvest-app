@@ -80,7 +80,7 @@ export interface OrderItem {
   quantity: string;
   offeredPrice: number;
   totalPrice: number;
-  status: 'Aktif' | 'Selesai' | 'Dibatalkan' | 'Menunggu Pickup';
+  status: 'Aktif' | 'Selesai' | 'Dibatalkan' | 'Menunggu Pickup' | 'Menunggu Konfirmasi';
   date: string;
   location: string;
   note?: string;
@@ -102,7 +102,7 @@ export type TabType = 'HOME' | 'MARKET' | 'ORDERS' | 'PROFILE';
 
 export type ScreenView =
   | { type: 'TAB'; tab: TabType }
-  | { type: 'BIDDING'; listing: FarmerListing }
+  | { type: 'BIDDING'; listing: FarmerListing; previousTab?: TabType }
   | { type: 'RECEIPT'; receipt: HandshakeReceiptData }
   | { type: 'TRANSACTION_DETAIL'; order: OrderItem }
   | { type: 'REVIEW'; order: OrderItem };

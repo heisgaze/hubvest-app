@@ -17,6 +17,16 @@ def get_transaction(id: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Transaction not found")
     return transaction
 
+@router.get("/me/all", response_model=List[schemas.Transaction])
+def get_my_transactions(db: Session = Depends(get_db)):
+    """
+    Get all transactions where the current user is either seller or buyer.
+    (Mock implementation: returns for both 'u1' and 'u2' for demo purposes if not auth'd)
+    """
+    # For now, we'll return all transactions so both mock users can see them
+    transactions = db.query(Transaction).order_by(Transaction.created_at.desc()).all()
+    return transactions
+
 @router.post("/{id}/complete")
 def complete_transaction(id: str, db: Session = Depends(get_db)):
     """
@@ -32,10 +42,32 @@ def complete_transaction(id: str, db: Session = Depends(get_db)):
     transaction.status = "completed"
     
     # Also mark the listing as completed
-    transaction.listing.status = "completed"
+    if transaction.listing:
+        transaction.listing.status = "completed"
     
     db.commit()
     return {"success": True, "message": "Transaction marked as completed"}
+
+@router.post("/{id}/cancel")
+def cancel_transaction(id: str, db: Session = Depends(get_db)):
+    """
+    Cancel a transaction.
+    """
+    transaction = db.query(Transaction).filter(Transaction.id == id).first()
+    if not transaction:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+        
+    if transaction.status == "completed":
+        raise HTTPException(status_code=400, detail="Cannot cancel a completed transaction")
+        
+    transaction.status = "cancelled"
+    
+    # Re-open the listing
+    if transaction.listing:
+        transaction.listing.status = "open"
+    
+    db.commit()
+    return {"success": True, "message": "Transaction cancelled"}
 
 @router.post("/{id}/reviews", response_model=schemas.Review)
 def submit_review(id: str, review: schemas.ReviewCreate, db: Session = Depends(get_db)):

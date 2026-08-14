@@ -6,10 +6,12 @@ interface TransactionDetailViewProps {
   order: OrderItem;
   onBack: () => void;
   onConfirmPickup: () => void;
+  onCancel?: () => void;
 }
 
-export const TransactionDetailView: React.FC<TransactionDetailViewProps> = ({ order, onBack, onConfirmPickup }) => {
+export const TransactionDetailView: React.FC<TransactionDetailViewProps> = ({ order, onBack, onConfirmPickup, onCancel }) => {
   const [isDone, setIsDone] = useState<boolean>(order.status === 'Selesai');
+  const [isCancelling, setIsCancelling] = useState(false);
 
   const handleTandaiDiambil = () => {
     setIsDone(true);
@@ -26,18 +28,24 @@ export const TransactionDetailView: React.FC<TransactionDetailViewProps> = ({ or
     const element = document.getElementById('kontrak');
     if (!element) return;
     
-    // Dynamically import html2pdf
-    const html2pdf = (await import('html2pdf.js')).default;
-    
-    const opt = {
-      margin:       0.5,
-      filename:     `Kontrak-${order.id}.pdf`,
-      image:        { type: 'jpeg' as const, quality: 0.98 },
-      html2canvas:  { scale: 2 },
-      jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
-    } as any;
-    
-    html2pdf().set(opt).from(element).save();
+    try {
+      // Dynamically import html2pdf
+      const html2pdf = (await import('html2pdf.js')).default;
+      
+      const opt = {
+        margin:       0.5,
+        filename:     `Kontrak-${order.id}.pdf`,
+        image:        { type: 'jpeg' as const, quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+      } as any;
+      
+      html2pdf().set(opt).from(element).save();
+    } catch (err) {
+      console.error("PDF Export failed with html2pdf:", err);
+      // Fallback to browser print which usually has 'Save to PDF'
+      window.print();
+    }
   };
 
   return (
@@ -164,23 +172,36 @@ export const TransactionDetailView: React.FC<TransactionDetailViewProps> = ({ or
         </div>
 
         {/* Action Button */}
-        <div className="pt-2">
+        <div className="pt-2 space-y-3">
           <button
             id="confirm-pickup-cta-btn"
             onClick={handleTandaiDiambil}
-            disabled={isDone}
+            disabled={isDone || order.status === 'Dibatalkan'}
             className={`w-full py-3.5 rounded-xl font-black text-sm shadow-md transition-all flex items-center justify-center gap-2 ${
               isDone
                 ? 'bg-slate-300 text-slate-600 cursor-not-allowed'
+                : order.status === 'Dibatalkan'
+                ? 'bg-red-100 text-red-500 cursor-not-allowed'
                 : 'bg-emerald-700 hover:bg-emerald-800 text-white active:scale-95 shadow-emerald-700/20'
             }`}
           >
-            {isDone ? (
-              '✓ Telah Dikonfirmasi Selesai'
-            ) : (
-              '✓ Tandai Sudah Diambil & Beri Rating ➢'
-            )}
+            {order.status === 'Dibatalkan' ? '❌ Transaksi Dibatalkan' : isDone ? '✓ Telah Dikonfirmasi Selesai' : '✓ Tandai Sudah Diambil & Beri Rating ➢'}
           </button>
+          
+          {!isDone && order.status !== 'Dibatalkan' && onCancel && (
+            <button
+              onClick={() => {
+                if(window.confirm("Yakin ingin membatalkan transaksi ini?")) {
+                  setIsCancelling(true);
+                  onCancel();
+                }
+              }}
+              disabled={isCancelling}
+              className="w-full py-3 rounded-xl font-bold text-sm text-red-500 hover:bg-red-50 transition-all border border-red-200"
+            >
+              {isCancelling ? "Membatalkan..." : "Batalkan Transaksi"}
+            </button>
+          )}
         </div>
       </div>
     </div>
