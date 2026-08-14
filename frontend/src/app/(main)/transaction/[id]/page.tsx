@@ -1,17 +1,14 @@
-"use client";
-
-import { useParams } from "next/navigation";
-import HeaderBar from "@/components/ui/HeaderBar";
-import ContractSummary from "@/components/transaction/ContractSummary";
-import StatusTimeline from "@/components/transaction/StatusTimeline";
-import { transactions } from "@/lib/mock-data";
 import Link from "next/link";
+import HeaderBar from "@/components/petani/ui/HeaderBar";
+import ContractSummary from "@/components/petani/transaction/ContractSummary";
+import StatusTimeline from "@/components/petani/transaction/StatusTimeline";
+import MarkAsPickedUpButton from "@/components/petani/transaction/MarkAsPickedUpButton";
+import { fetchTransactionDetail } from "@/lib/api";
 
-export default function TransactionDetailPage() {
-  const params = useParams();
-  const id = params?.id as string;
+export default async function TransactionDetailPage({ params }: { params: { id: string } }) {
+  const id = params.id;
   
-  const transaction = transactions.find((t) => t.id === id) || transactions[0];
+  const transaction = await fetchTransactionDetail(id);
 
   if (!transaction) return null;
 
@@ -26,11 +23,9 @@ export default function TransactionDetailPage() {
       </div>
 
       {/* Action Buttons based on status */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-100 max-w-md mx-auto z-10">
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-100 max-w-md mx-auto z-10 pb-safe">
         {transaction.status === "pickup_scheduled" && (
-          <button className="w-full btn-primary py-3.5 rounded-xl font-bold">
-            Konfirmasi Pengambilan
-          </button>
+          <MarkAsPickedUpButton transactionId={transaction.id} />
         )}
         
         {transaction.status === "completed" && (

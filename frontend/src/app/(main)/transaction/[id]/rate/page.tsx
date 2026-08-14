@@ -1,10 +1,12 @@
 "use client";
+import React, { useState } from 'react';
+import { useRouter, useParams } from 'next/navigation';
+import HeaderBar from '@/components/petani/ui/HeaderBar';
+import StarRating from '@/components/petani/ui/StarRating';
 
-import { useParams, useRouter } from "next/navigation";
-import { useState } from "react";
-import HeaderBar from "@/components/ui/HeaderBar";
-import StarRating from "@/components/ui/StarRating";
-import { transactions } from "@/lib/mock-data";
+import { fetchTransactionDetail } from '@/lib/api';
+import { Transaction } from '@/lib/types';
+
 
 export default function RatingPage() {
   const params = useParams();
@@ -15,8 +17,12 @@ export default function RatingPage() {
   const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [transaction, setTransaction] = useState<Transaction | null>(null);
 
-  const transaction = transactions.find((t) => t.id === id) || transactions[0];
+  React.useEffect(() => {
+    fetchTransactionDetail(id).then(setTransaction);
+  }, [id]);
+
   const partner = transaction?.tengkulak; // Assuming current user is farmer
 
   const handleSubmit = (e: React.FormEvent) => {

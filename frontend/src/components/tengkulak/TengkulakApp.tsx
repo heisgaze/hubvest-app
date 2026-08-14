@@ -1,0 +1,332 @@
+"use client";
+
+import React, { useState } from 'react';
+import {
+  TabType,
+  Commodity,
+  FarmerListing,
+  OrderItem,
+  NotificationItem,
+  HandshakeReceiptData,
+  ScreenView,
+} from "@/components/tengkulak/types";
+// No mock data imported
+
+import { MobileFrame } from "@/components/common/MobileFrame";
+import { Header } from "@/components/tengkulak/ui/Header";
+import { BottomNav } from "@/components/tengkulak/ui/TengkulakBottomNav";
+import { HomeView } from "@/components/tengkulak/views/HomeView";
+import { MarketView } from "@/components/tengkulak/views/MarketView";
+import { OrdersView } from "@/components/tengkulak/views/OrdersView";
+import { ProfileView } from "@/components/tengkulak/views/ProfileView";
+
+import { fetchListings, submitBid } from "@/lib/api";
+
+import { BiddingView } from "@/components/tengkulak/views/BiddingView";
+import { ReceiptView } from "@/components/tengkulak/views/ReceiptView";
+import { TransactionDetailView } from "@/components/tengkulak/views/TransactionDetailView";
+import { ReviewView } from "@/components/tengkulak/views/ReviewView";
+
+import { CatatPanenModal } from "@/components/tengkulak/modals/CatatPanenModal";
+import { CommodityDetailModal } from "@/components/tengkulak/modals/CommodityDetailModal";
+import { FarmerDetailModal } from "@/components/tengkulak/modals/FarmerDetailModal";
+import { LocationModal } from "@/components/tengkulak/modals/LocationModal";
+import { NotificationModal } from "@/components/tengkulak/modals/NotificationModal";
+
+export default function TengkulakApp() {
+  const [screenView, setScreenView] = useState<ScreenView>({ type: 'TAB', tab: 'HOME' });
+  const [currentLocation, setCurrentLocation] = useState('Brebes, Jawa Tengah');
+
+  const [commodities, setCommodities] = useState<Commodity[]>([]);
+  const [farmerListings, setFarmerListings] = useState<FarmerListing[]>([]);
+  const [orders, setOrders] = useState<OrderItem[]>([]);
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+
+  // Load listings from Backend
+  React.useEffect(() => {
+    fetchListings("open").then((listings) => {
+      const mapped = listings.map(l => ({
+        id: l.id,
+        farmerName: l.farmer.name,
+        farmerPhoto: l.farmer.avatar || "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=250",
+        commodityName: l.commodity.name,
+        commodityPhoto: "https://images.unsplash.com/photo-1618512496248-a07fe83aa8cf?auto=format&fit=crop&q=80&w=800",
+        location: l.location,
+        distance: "12 km",
+        price: l.minPrice,
+        volume: l.volume.toString(),
+        unit: l.unit,
+        rating: l.farmer.rating,
+        timeAgo: "Baru saja",
+        badge: l.grade as any || "B",
+        commodityIcon: '🧅', // Mocked for UI requirements
+        amount: `${l.volume} ${l.unit}`,
+        date: l.harvestDate,
+        buyersCount: l.bidCount,
+        minOrder: 100,
+        estimatedTotal: l.minPrice * l.volume,
+        isVerified: l.farmer.verified,
+        isHot: l.bidCount > 2
+      }));
+      setFarmerListings(mapped as any);
+    });
+  }, []);
+
+  // Modals
+  const [isCatatPanenOpen, setIsCatatPanenOpen] = useState(false);
+  const [selectedCommodity, setSelectedCommodity] = useState<Commodity | null>(null);
+  const [selectedFarmer, setSelectedFarmer] = useState<FarmerListing | null>(null);
+  const [isLocationOpen, setIsLocationOpen] = useState(false);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+
+  // Handlers
+  const handleSaveHarvest = (newListing: FarmerListing) => {
+    setFarmerListings([newListing, ...farmerListings]);
+  };
+
+  const handleOpenBidding = (farmer: FarmerListing) => {
+    setSelectedFarmer(null);
+    setScreenView({ type: 'BIDDING', listing: farmer });
+  };
+
+  const handleSubmitOffer = (farmer: FarmerListing, quantityStr: string, offerPrice: number) => {
+    const qty = parseInt(quantityStr, 10) || 100;
+    const newOrder: OrderItem = {
+      id: `HB-${Math.floor(1000 + Math.random() * 9000)}-BS`,
+      farmerName: farmer.farmerName,
+      farmerPhoto: farmer.farmerPhoto,
+      commodityName: farmer.commodityName,
+      quantity: `${qty} Kg`,
+      offeredPrice: offerPrice,
+      totalPrice: qty * offerPrice,
+      status: 'Menunggu Pickup',
+      date: 'Hari ini',
+      location: farmer.location,
+      note: 'Digital Handshake Berhasil Disepakati',
+      buyerName: 'Budi Santoso',
+      buyerRole: 'TENGKULAK PREMIUM',
+      buyerVehicle: 'Truk Engkel • B 9921 KIZ',
+    };
+
+    setOrders([newOrder, ...orders]);
+  };
+
+  const handleBiddingComplete = async (receiptData: HandshakeReceiptData) => {
+    // 1. Call Backend to submit Bid
+    const listingId = screenView.type === 'BIDDING' ? screenView.listing.id : 'unknown';
+    const res = await submitBid(listingId, receiptData.finalPrice / receiptData.volumeKg);
+    
+    if (!res.success) {
+      alert("Gagal menawar: " + res.message);
+      return;
+    }
+
+    // Add to orders
+    const newOrder: OrderItem = {
+      id: receiptData.contractId,
+      farmerName: 'Pak Slamet Rahardjo',
+      farmerPhoto: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=250',
+      commodityName: receiptData.commodityName,
+      commodityPhoto: receiptData.commodityPhoto,
+      quantity: `${receiptData.volumeKg} Kg`,
+      offeredPrice: receiptData.finalPrice / receiptData.volumeKg,
+      totalPrice: receiptData.finalPrice,
+      status: 'Menunggu Pickup',
+      date: 'Hari ini',
+      location: 'Wanasari, Brebes',
+      note: 'Konfirmasi Digital Handshake Selesai',
+      buyerName: 'Budi Santoso',
+      buyerRole: 'TENGKULAK PREMIUM',
+      buyerVehicle: 'Truk Engkel • B 9921 KIZ',
+    };
+
+    setOrders([newOrder, ...orders]);
+
+    // Add notification
+    const newNotif: NotificationItem = {
+      id: `notif-${Date.now()}`,
+      title: 'Tawaran Terkirim! 🎉',
+      message: `Tawaran Anda sebesar Rp ${(receiptData.finalPrice / receiptData.volumeKg).toLocaleString('id-ID')} untuk lot ini berhasil dikirim ke petani.`,
+      time: 'Baru saja',
+      read: false,
+      type: 'offer',
+    };
+
+    setNotifications([newNotif, ...notifications]);
+
+    // Go to Receipt screen
+    setScreenView({ type: 'RECEIPT', receipt: receiptData });
+  };
+
+  const handleConfirmPickupAndReview = (order: OrderItem) => {
+    // Update order status to Selesai
+    setOrders((prev) =>
+      prev.map((o) => (o.id === order.id ? { ...o, status: 'Selesai' } : o))
+    );
+    // Go to Review Screen
+    setScreenView({ type: 'REVIEW', order });
+  };
+
+  const handleReviewSubmitted = (rating: number, comment: string) => {
+    alert(`Terima kasih! Ulasan ${rating} bintang berhasil dikirim ke mitra pertanian.`);
+    setScreenView({ type: 'TAB', tab: 'ORDERS' });
+  };
+
+  const unreadNotifCount = notifications.filter((n) => !n.read).length;
+
+  const handleMarkAllNotifRead = () => {
+    setNotifications(notifications.map((n) => ({ ...n, read: true })));
+  };
+
+  const currentTab = screenView.type === 'TAB' ? screenView.tab : 'HOME';
+
+  return (
+    <MobileFrame>
+      <div id="app-root-frame" className="min-h-full flex flex-col bg-[#F8F9FA] relative">
+        {/* Render Header only when in TAB view */}
+        {screenView.type === 'TAB' && (
+          <Header
+            location={currentLocation}
+            unreadCount={unreadNotifCount}
+            currentTab={currentTab}
+            onLocationClick={() => setIsLocationOpen(true)}
+            onNotificationClick={() => setIsNotificationOpen(true)}
+            onProfileClick={() => setScreenView({ type: 'TAB', tab: 'PROFILE' })}
+          />
+        )}
+
+        {/* Dynamic Screen Router */}
+        <main className="flex-1 overflow-y-auto no-scrollbar">
+          {screenView.type === 'TAB' && screenView.tab === 'HOME' && (
+            <HomeView
+              commodities={commodities}
+              farmerListings={farmerListings}
+              onLihatSemuaClick={() => setScreenView({ type: 'TAB', tab: 'MARKET' })}
+              onCommodityClick={(c) => setSelectedCommodity(c)}
+              onFarmerClick={(f) => handleOpenBidding(f)}
+              onCatatPanenClick={() => setIsCatatPanenOpen(true)}
+            />
+          )}
+
+          {screenView.type === 'TAB' && screenView.tab === 'MARKET' && (
+            <MarketView
+              farmerListings={farmerListings}
+              commodities={commodities}
+              onFarmerClick={(f) => handleOpenBidding(f)}
+              onCommoditySelect={(c) => setSelectedCommodity(c)}
+            />
+          )}
+
+          {screenView.type === 'TAB' && screenView.tab === 'ORDERS' && (
+            <OrdersView
+              orders={orders}
+              onSelectOrder={(order) => {
+                if (order.status === 'Menunggu Pickup') {
+                  setScreenView({ type: 'TRANSACTION_DETAIL', order });
+                } else {
+                  setScreenView({ type: 'REVIEW', order });
+                }
+              }}
+            />
+          )}
+
+          {screenView.type === 'TAB' && screenView.tab === 'PROFILE' && (
+            <ProfileView
+              location={currentLocation}
+              onLocationClick={() => setIsLocationOpen(true)}
+              myListingsCount={farmerListings.length}
+            />
+          )}
+
+          {/* Screen 3: Live Bidding */}
+          {screenView.type === 'BIDDING' && (
+            <BiddingView
+              listing={screenView.listing}
+              onBack={() => setScreenView({ type: 'TAB', tab: 'HOME' })}
+              onSubmitOffer={handleBiddingComplete}
+            />
+          )}
+
+          {/* Screen 4: Digital Handshake Receipt */}
+          {screenView.type === 'RECEIPT' && (
+            <ReceiptView
+              receipt={screenView.receipt}
+              onGoToOrders={() => setScreenView({ type: 'TAB', tab: 'ORDERS' })}
+              onOpenPickupDetail={() => {
+                if (orders.length > 0) {
+                  setScreenView({ type: 'TRANSACTION_DETAIL', order: orders[0] });
+                }
+              }}
+            />
+          )}
+
+          {/* Screen 6: Transaction Detail / Konfirmasi Pengambilan */}
+          {screenView.type === 'TRANSACTION_DETAIL' && (
+            <TransactionDetailView
+              order={screenView.order}
+              onBack={() => setScreenView({ type: 'TAB', tab: 'ORDERS' })}
+              onConfirmPickup={() => handleConfirmPickupAndReview(screenView.order)}
+            />
+          )}
+
+          {/* Screen 7: Review & Rating */}
+          {screenView.type === 'REVIEW' && (
+            <ReviewView
+              order={screenView.order}
+              onBack={() => setScreenView({ type: 'TAB', tab: 'ORDERS' })}
+              onSubmitReview={handleReviewSubmitted}
+            />
+          )}
+        </main>
+
+        {/* Render Bottom Navigation only when in TAB view */}
+        {screenView.type === 'TAB' && (
+          <BottomNav
+            activeTab={currentTab}
+            onTabChange={(tab) => setScreenView({ type: 'TAB', tab })}
+          />
+        )}
+
+        {/* Global Modals */}
+        <CatatPanenModal
+          isOpen={isCatatPanenOpen}
+          onClose={() => setIsCatatPanenOpen(false)}
+          onSave={handleSaveHarvest}
+        />
+
+        <CommodityDetailModal
+          commodity={selectedCommodity}
+          onClose={() => setSelectedCommodity(null)}
+          onTawarClick={() => {
+            if (farmerListings.length > 0) {
+              handleOpenBidding(farmerListings[0]);
+            }
+          }}
+        />
+
+        <FarmerDetailModal
+          farmer={selectedFarmer}
+          onClose={() => setSelectedFarmer(null)}
+          onSubmitOffer={(farmer, qty, price) => {
+            handleSubmitOffer(farmer, qty, price);
+            handleOpenBidding(farmer);
+          }}
+        />
+
+        <LocationModal
+          isOpen={isLocationOpen}
+          currentLocation={currentLocation}
+          onClose={() => setIsLocationOpen(false)}
+          onSelectLocation={(loc) => setCurrentLocation(loc)}
+        />
+
+        <NotificationModal
+          isOpen={isNotificationOpen}
+          notifications={notifications}
+          onClose={() => setIsNotificationOpen(false)}
+          onMarkAllRead={handleMarkAllNotifRead}
+        />
+      </div>
+    </MobileFrame>
+  );
+}

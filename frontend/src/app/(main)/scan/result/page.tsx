@@ -1,14 +1,14 @@
 import React from "react";
 import Link from "next/link";
-import HeaderBar from "@/components/ui/HeaderBar";
-import GradeResultCard from "@/components/scan/GradeResultCard";
+import HeaderBar from "@/components/petani/ui/HeaderBar";
+import GradeResultCard from "@/components/petani/scan/GradeResultCard";
 import { analyzeCV } from "@/lib/api";
 
 export default async function ScanResultPage() {
   const result = await analyzeCV();
 
   return (
-    <div className="min-h-screen bg-surface-bg pb-24">
+    <div className="bg-surface-bg">
       <HeaderBar title="Hasil Scan" showBack={true} />
       
       <main className="px-4 py-2">

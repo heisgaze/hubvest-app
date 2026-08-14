@@ -1,10 +1,27 @@
 "use client";
 
 import { useTransition } from "react";
-import HeaderBar from "@/components/ui/HeaderBar";
-import { commodities, currentUser } from "@/lib/mock-data";
 import { useRouter } from "next/navigation";
 import { createListingAction } from "@/app/actions";
+import HeaderBar from "@/components/petani/ui/HeaderBar";
+
+// Removed mock data, using empty fallbacks for build
+const currentUser = { id: "", name: "Pengguna", role: "farmer", avatar: "", location: "", rating: 0, totalTransactions: 0, joinedDate: "", verified: false };
+const users: any[] = [];
+const commodities = [
+  { id: "c1", name: "Bawang Merah" },
+  { id: "c2", name: "Cabai Merah" },
+  { id: "c3", name: "Tomat" },
+  { id: "c4", name: "Bawang Putih" },
+  { id: "c5", name: "Kentang" }
+];
+const marketPrices: any[] = [];
+const listings: any[] = [];
+const bids: any[] = [];
+const transactions: any[] = [];
+const reviews: any[] = [];
+const chatPreviews: any[] = [];
+const chatMessages: any = {};
 
 export default function CreateListingPage() {
   const router = useRouter();

@@ -35,6 +35,7 @@ export interface MarketPrice {
   changePercent: number;
   trend: "up" | "down" | "stable";
   date: string;
+  location: string;
   sparklineData: number[];
 }
 

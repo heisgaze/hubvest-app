@@ -1,9 +1,20 @@
 "use client";
+import React, { useState } from 'react';
+import HeaderBar from '@/components/petani/ui/HeaderBar';
+import { ChatPreviewCard } from '@/components/petani/chat/ChatPreviewCard';
 
-import { useState } from "react";
-import HeaderBar from "@/components/ui/HeaderBar";
-import { ChatPreviewCard } from "@/components/chat/ChatPreviewCard";
-import { chatPreviews } from "@/lib/mock-data";
+// Removed mock data, using empty fallbacks for build
+const currentUser = { id: "", name: "Pengguna", role: "farmer", avatar: "", location: "", rating: 0, totalTransactions: 0, joinedDate: "", verified: false };
+const users: any[] = [];
+const commodities: any[] = [];
+const marketPrices: any[] = [];
+const listings: any[] = [];
+const bids: any[] = [];
+const transactions: any[] = [];
+const reviews: any[] = [];
+const chatPreviews: any[] = [];
+const chatMessages: any = {};
+
 
 export default function ChatListPage() {
   const [searchQuery, setSearchQuery] = useState("");

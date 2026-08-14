@@ -22,6 +22,7 @@ export async function createListingAction(formData: FormData) {
   const userId = await getRoleCookie();
   
   const payload = {
+    seller_id: userId,
     commodity_id: formData.get("commodity"),
     title: formData.get("title") || "Panen Baru",
     quantity: parseFloat(formData.get("quantity") as string),
@@ -30,7 +31,6 @@ export async function createListingAction(formData: FormData) {
     location: formData.get("location"),
     grade: "B",
     description: formData.get("description"),
-    status: "active"
   };
 
   const res = await fetch(`${API_BASE_URL}/listings/`, {

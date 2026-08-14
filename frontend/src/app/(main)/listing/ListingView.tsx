@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import ListingCard from "@/components/listing/ListingCard";
+import ListingCard from "@/components/petani/listing/ListingCard";
 import Link from "next/link";
 import { Listing } from "@/lib/types";
 
@@ -38,9 +38,7 @@ export default function ListingView({ initialListings }: { initialListings: List
       <main className="p-4 space-y-4">
         {filteredListings.length > 0 ? (
           filteredListings.map((listing: Listing) => (
-            <Link href={`/listing/${listing.id}`} key={listing.id} className="block">
-              <ListingCard listing={listing} />
-            </Link>
+            <ListingCard key={listing.id} listing={listing} />
           ))
         ) : (
           <div className="text-center py-12 text-gray-500">

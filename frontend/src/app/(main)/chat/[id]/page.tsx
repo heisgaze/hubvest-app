@@ -1,10 +1,20 @@
 "use client";
-
-import { useState, useRef, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
-import { MessageBubble } from "@/components/chat/MessageBubble";
-import { chatMessages, chatPreviews, currentUser } from "@/lib/mock-data";
+import React, { useState, useRef, useEffect } from 'react';
+import { useRouter, useParams } from 'next/navigation';
+import { MessageBubble } from '@/components/petani/chat/MessageBubble';
 import { Message } from "@/lib/types";
+
+// Removed mock data, using empty fallbacks for build
+const currentUser = { id: "", name: "Pengguna", role: "farmer", avatar: "", location: "", rating: 0, totalTransactions: 0, joinedDate: "", verified: false };
+const users: any[] = [];
+const commodities: any[] = [];
+const marketPrices: any[] = [];
+const listings: any[] = [];
+const bids: any[] = [];
+const transactions: any[] = [];
+const reviews: any[] = [];
+const chatPreviews: any[] = [];
+const chatMessages: any = {};
 
 export default function ChatRoomPage() {
   const router = useRouter();

@@ -1,90 +1,110 @@
 from pydantic import BaseModel, ConfigDict
-from typing import List, Optional
+from typing import Optional, List
 from datetime import datetime
-from uuid import UUID
 
-# Shared Config
-class OrmBase(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
-# User
-class UserBase(OrmBase):
-    id: UUID
+class UserBase(BaseModel):
     name: str
     role: str
-    location: Optional[str]
+    avatar: Optional[str] = None
+    phone: Optional[str] = None
+    location: Optional[str] = None
+
+class User(UserBase):
+    id: str
     rating: float
     total_transactions: int
-    joined_date: datetime
+    verified: bool
+    created_at: datetime
+    
+    model_config = ConfigDict(from_attributes=True)
 
-# Commodity
-class CommodityBase(OrmBase):
-    id: str
+class CommodityBase(BaseModel):
     name: str
-    icon: Optional[str]
+    icon: Optional[str] = None
 
-# Market Price
-class MarketPriceBase(OrmBase):
-    id: UUID
+class Commodity(CommodityBase):
+    id: str
+    
+    model_config = ConfigDict(from_attributes=True)
+
+class MarketPriceBase(BaseModel):
     commodity_id: str
+    location: str
     price: float
-    trend: str
+    trend: str = "up"
+
+class MarketPrice(MarketPriceBase):
+    id: str
     date: datetime
-    location: Optional[str]
+    commodity: Optional[Commodity] = None
+    
+    model_config = ConfigDict(from_attributes=True)
 
-# Listing
-class ListingBase(OrmBase):
-    id: UUID
-    seller_id: UUID
+class ListingBase(BaseModel):
     commodity_id: str
     title: str
     quantity: float
-    unit: str
+    unit: str = "Kg"
     price: float
-    location: Optional[str]
+    location: str
+    description: Optional[str] = None
+    grade: Optional[str] = None
+
+class ListingCreate(ListingBase):
+    seller_id: str
+
+class Listing(ListingBase):
+    id: str
+    seller_id: str
     status: str
     created_at: datetime
-    grade: Optional[str]
-    description: Optional[str]
+    seller: Optional[User] = None
+    commodity: Optional[Commodity] = None
+    
+    model_config = ConfigDict(from_attributes=True)
 
-class ListingCreate(BaseModel):
-    commodity_id: str
-    title: str
-    quantity: float
-    unit: str = "kg"
-    price: float
-    location: Optional[str]
-    grade: Optional[str]
-    description: Optional[str]
-
-# Bid
-class BidBase(OrmBase):
-    id: UUID
-    listing_id: UUID
-    bidder_id: UUID
+class BidBase(BaseModel):
+    listing_id: str
+    bidder_id: str
     amount: float
+
+class Bid(BidBase):
+    id: str
+    status: str
+    pfi_score: Optional[float] = None
+    pfi_color: Optional[str] = None
+    created_at: datetime
+    bidder: Optional[User] = None
+    
+    model_config = ConfigDict(from_attributes=True)
+
+class TransactionBase(BaseModel):
+    listing_id: str
+    bid_id: str
+    seller_id: str
+    buyer_id: str
+    final_price: float
+    meeting_address: Optional[str] = None
+
+class Transaction(TransactionBase):
+    id: str
     status: str
     created_at: datetime
+    
+    model_config = ConfigDict(from_attributes=True)
 
-class BidCreate(BaseModel):
-    amount: float
+class ReviewBase(BaseModel):
+    transaction_id: str
+    reviewee_id: str
+    rating: int
+    comment: Optional[str] = None
 
-# Transaction
-class TransactionBase(OrmBase):
-    id: UUID
-    listing_id: UUID
-    buyer_id: UUID
-    amount: float
-    status: str
+class ReviewCreate(ReviewBase):
+    reviewer_id: str
+
+class Review(ReviewBase):
+    id: str
+    reviewer_id: str
     created_at: datetime
-
-# Relations
-class BidResponse(BidBase):
-    pass
-
-class ListingResponse(ListingBase):
-    commodity: CommodityBase
-    bids: List[BidResponse] = []
-
-class TransactionResponse(TransactionBase):
-    pass
+    
+    model_config = ConfigDict(from_attributes=True)

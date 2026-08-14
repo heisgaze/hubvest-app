@@ -2,10 +2,21 @@
 
 import Link from "next/link";
 import { useRouter, useParams } from "next/navigation";
-import Badge, { gradeToBadgeVariant } from "@/components/ui/Badge";
-import StarRating from "@/components/ui/StarRating";
-import { users, reviews, listings } from "@/lib/mock-data";
 import { formatDate, formatRupiah } from "@/lib/utils";
+import Badge, { gradeToBadgeVariant } from "@/components/petani/ui/Badge";
+import StarRating from "@/components/petani/ui/StarRating";
+
+// Removed mock data, using empty fallbacks for build
+const currentUser = { id: "", name: "Pengguna", role: "farmer", avatar: "", location: "", rating: 0, totalTransactions: 0, joinedDate: "", verified: false };
+const users: any[] = [];
+const commodities: any[] = [];
+const marketPrices: any[] = [];
+const listings: any[] = [];
+const bids: any[] = [];
+const transactions: any[] = [];
+const reviews: any[] = [];
+const chatPreviews: any[] = [];
+const chatMessages: any = {};
 
 export default function OtherProfilePage() {
   const router = useRouter();

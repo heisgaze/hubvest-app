@@ -1,6 +1,6 @@
 import React from "react";
-import HeaderBar from "@/components/ui/HeaderBar";
-import CameraViewfinder from "@/components/scan/CameraViewfinder";
+import HeaderBar from "@/components/petani/ui/HeaderBar";
+import CameraViewfinder from "@/components/petani/scan/CameraViewfinder";
 
 export default function ScanPage() {
   return (

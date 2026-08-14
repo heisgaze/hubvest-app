@@ -1,18 +1,34 @@
 import React from "react";
-import { currentUser } from "@/lib/mock-data";
 import { fetchMarketPrices } from "@/lib/api";
-import DashboardInteractive from "@/components/dashboard/DashboardInteractive";
-import TrendCard from "@/components/dashboard/TrendCard";
-import HeaderBar from "@/components/ui/HeaderBar";
+import DashboardInteractive from "@/components/petani/dashboard/DashboardInteractive";
+import TrendCard from "@/components/petani/dashboard/TrendCard";
+import HeaderBar from "@/components/petani/ui/HeaderBar";
+import { getRoleCookie } from "@/app/actions";
+import TengkulakApp from "@/components/tengkulak/TengkulakApp";
+
+// Removed mock data, using empty fallbacks for build
+const currentUser = { id: "", name: "Pengguna", role: "farmer", avatar: "", location: "", rating: 0, totalTransactions: 0, joinedDate: "", verified: false };
+const users: any[] = [];
+const commodities: any[] = [];
+const marketPrices: any[] = [];
+const listings: any[] = [];
+const bids: any[] = [];
+const transactions: any[] = [];
+const reviews: any[] = [];
+const chatPreviews: any[] = [];
+const chatMessages: any = {};
 
 export default async function DashboardPage() {
+  const roleId = await getRoleCookie();
+  const isTengkulak = roleId === "c25594e8-7901-40ae-b202-da8d1512990d";
+
+  if (isTengkulak) {
+    return <TengkulakApp />;
+  }
+
   const marketPrices = await fetchMarketPrices();
   
-  const trending = [
-    { name: "Bawang Merah", change: 5.2, trend: "up" as const },
-    { name: "Cabai Rawit", change: -2.1, trend: "down" as const },
-    { name: "Beras Premium", change: 1.5, trend: "up" as const },
-  ];
+  const trending: any[] = [];
 
   const rightActions = (
     <div className="flex items-center gap-3">

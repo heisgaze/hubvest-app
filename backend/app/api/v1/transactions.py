@@ -1,55 +1,68 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy.orm import Session
+from ...db.database import get_db
+from ...db.models import Transaction, Review, User
+from ...schemas import schemas
 from typing import List
-from uuid import UUID
-from pydantic import BaseModel
 
-from app.api.dependencies import get_db, get_current_user
-from app.db.models import Transaction, User
-from app.schemas.schemas import TransactionResponse
+router = APIRouter()
 
-router = APIRouter(prefix="/api/v1/transactions", tags=["Transactions"])
-
-class StatusUpdate(BaseModel):
-    status: str
-
-@router.get("/", response_model=List[TransactionResponse])
-async def get_transactions(
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
-):
-    if current_user.role == "farmer":
-        # Farmer's transactions (where they are the seller in the listing)
-        # For simplicity in MVP, we just return all transactions
-        # A more robust query would join with Listing to filter by seller_id
-        result = await db.execute(select(Transaction))
-    else:
-        # Tengkulak's transactions
-        result = await db.execute(select(Transaction).where(Transaction.buyer_id == current_user.id))
-        
-    return result.scalars().all()
-
-@router.get("/{id}", response_model=TransactionResponse)
-async def get_transaction(id: UUID, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(Transaction).where(Transaction.id == id))
-    transaction = result.scalar_one_or_none()
+@router.get("/{id}", response_model=schemas.Transaction)
+def get_transaction(id: str, db: Session = Depends(get_db)):
+    """
+    Get details of a specific Digital Handshake (Transaction).
+    """
+    transaction = db.query(Transaction).filter(Transaction.id == id).first()
     if not transaction:
         raise HTTPException(status_code=404, detail="Transaction not found")
     return transaction
 
-@router.put("/{id}/status", response_model=TransactionResponse)
-async def update_transaction_status(
-    id: UUID,
-    status_update: StatusUpdate,
-    db: AsyncSession = Depends(get_db)
-):
-    result = await db.execute(select(Transaction).where(Transaction.id == id))
-    transaction = result.scalar_one_or_none()
+@router.post("/{id}/complete")
+def complete_transaction(id: str, db: Session = Depends(get_db)):
+    """
+    Mark transaction as completed (Sudah Diambil by Petani).
+    """
+    transaction = db.query(Transaction).filter(Transaction.id == id).first()
     if not transaction:
         raise HTTPException(status_code=404, detail="Transaction not found")
         
-    transaction.status = status_update.status
-    await db.commit()
-    await db.refresh(transaction)
-    return transaction
+    if transaction.status == "completed":
+        raise HTTPException(status_code=400, detail="Transaction is already completed")
+        
+    transaction.status = "completed"
+    
+    # Also mark the listing as completed
+    transaction.listing.status = "completed"
+    
+    db.commit()
+    return {"success": True, "message": "Transaction marked as completed"}
+
+@router.post("/{id}/reviews", response_model=schemas.Review)
+def submit_review(id: str, review: schemas.ReviewCreate, db: Session = Depends(get_db)):
+    """
+    Submit a review for a transaction.
+    """
+    # 1. Verify transaction exists and is completed
+    transaction = db.query(Transaction).filter(Transaction.id == id).first()
+    if not transaction:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+        
+    if transaction.status != "completed":
+        raise HTTPException(status_code=400, detail="Cannot review an incomplete transaction")
+        
+    # 2. Save review
+    db_review = Review(**review.model_dump())
+    db.add(db_review)
+    
+    # 3. Update User Rating
+    # Calculate new average rating for the reviewee
+    reviewee = db.query(User).filter(User.id == review.reviewee_id).first()
+    if reviewee:
+        current_total = reviewee.total_transactions * reviewee.rating
+        reviewee.total_transactions += 1
+        reviewee.rating = (current_total + review.rating) / reviewee.total_transactions
+        
+    db.commit()
+    db.refresh(db_review)
+    
+    return db_review

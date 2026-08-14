@@ -27,11 +27,11 @@ export function calculatePFI(
   let label: string;
   let description: string;
 
-  if (clampedScore >= 80) {
+  if (clampedScore >= 90) {
     status = "green";
     label = "Harga Wajar";
     description = "Harga yang ditawarkan sesuai dengan harga pasar saat ini.";
-  } else if (clampedScore >= 60) {
+  } else if (clampedScore >= 75) {
     status = "yellow";
     label = "Perlu Negosiasi";
     description = "Harga di bawah rata-rata pasar. Pertimbangkan untuk negosiasi.";
