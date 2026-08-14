@@ -49,9 +49,9 @@ export default function PFICalculator({ defaultMarketPrice }: { defaultMarketPri
           <label className="block text-xs font-medium text-gray-500 mb-1">Harga Pasar</label>
           <input 
             type="number" 
-            className="w-full bg-surface-bg border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-accent"
+            className="w-full bg-gray-100 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-500 cursor-not-allowed"
             value={marketPrice}
-            onChange={(e) => setMarketPrice(Number(e.target.value))}
+            readOnly
           />
         </div>
       </div>
