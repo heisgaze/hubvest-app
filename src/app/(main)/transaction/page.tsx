@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import HeaderBar from "@/components/petani/ui/HeaderBar";
+export const dynamic = "force-dynamic";
 import { fetchIncomingBids } from "@/lib/api";
 import Link from "next/link";
 import BidCard from "@/components/petani/listing/BidCard";

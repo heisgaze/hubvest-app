@@ -1,4 +1,5 @@
 import React from "react";
+export const dynamic = "force-dynamic";
 import { fetchMarketPrices } from "@/lib/api";
 import DashboardInteractive from "@/components/petani/dashboard/DashboardInteractive";
 import TrendCard from "@/components/petani/dashboard/TrendCard";

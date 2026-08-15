@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import HeaderBar from "@/components/petani/ui/HeaderBar";
 import { fetchListings } from "@/lib/api";
 import Link from "next/link";
