@@ -1,1 +1,9 @@
-{}
+{
+  "components/tengkulak/views/TransactionDetailView.tsx -> html2pdf.js": {
+    "id": 1690,
+    "files": [
+      "static/chunks/b645e135.646b800dd5397c75.js",
+      "static/chunks/ad2866b8.a1343deb0eef8820.js"
+    ]
+  }
+}

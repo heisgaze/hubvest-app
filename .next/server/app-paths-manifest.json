@@ -1,1 +1,17 @@
-{}
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/(main)/chat/[id]/page": "app/(main)/chat/[id]/page.js",
+  "/(main)/listing/[id]/page": "app/(main)/listing/[id]/page.js",
+  "/(main)/listing/create/page": "app/(main)/listing/create/page.js",
+  "/(main)/scan/page": "app/(main)/scan/page.js",
+  "/(main)/listing/page": "app/(main)/listing/page.js",
+  "/(main)/transaction/[id]/page": "app/(main)/transaction/[id]/page.js",
+  "/(main)/profile/page": "app/(main)/profile/page.js",
+  "/(main)/chat/page": "app/(main)/chat/page.js",
+  "/(main)/page": "app/(main)/page.js",
+  "/(main)/transaction/[id]/rate/page": "app/(main)/transaction/[id]/rate/page.js",
+  "/(main)/transaction/page": "app/(main)/transaction/page.js",
+  "/(main)/scan/result/page": "app/(main)/scan/result/page.js",
+  "/(main)/profile/[id]/page": "app/(main)/profile/[id]/page.js"
+}

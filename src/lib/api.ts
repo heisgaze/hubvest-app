@@ -17,7 +17,7 @@ function getHeaders(userId: string = "u1", extraHeaders = {}) {
 
 export async function fetchMarketPrices(userId: string = "u1"): Promise<MarketPrice[]> {
   try {
-    const res = await fetch(`${API_BASE_URL}/market-prices/`, { cache: "no-store", headers: getHeaders(userId) });
+    const res = await fetch(`${API_BASE_URL}/market-prices`, { cache: "no-store", headers: getHeaders(userId) });
     if (!res.ok) throw new Error("Failed to fetch market prices");
     const data = await res.json();
     
@@ -128,7 +128,7 @@ export async function analyzeCV(imageBlob?: Blob | File, userId: string = "u1"):
 
 export async function fetchListings(status: string = "open", userId: string = "u1"): Promise<Listing[]> {
   try {
-    const res = await fetch(`${API_BASE_URL}/listings/?status=${status}`, { cache: "no-store", headers: getHeaders(userId) });
+    const res = await fetch(`${API_BASE_URL}/listings?status=${status}`, { cache: "no-store", headers: getHeaders(userId) });
     if (!res.ok) throw new Error("Failed to fetch listings");
     const data = await res.json();
     
@@ -174,7 +174,7 @@ export async function fetchListings(status: string = "open", userId: string = "u
 
 export async function createListing(payload: any, userId: string = "u1"): Promise<{ success: boolean, message?: string }> {
   try {
-    const res = await fetch(`${API_BASE_URL}/listings/`, {
+    const res = await fetch(`${API_BASE_URL}/listings`, {
       method: "POST",
       headers: getHeaders(userId),
       body: JSON.stringify(payload)
@@ -294,7 +294,7 @@ export async function fetchListing(id: string, userId: string = "u1"): Promise<{
 
 export async function submitBid(listingId: string, amount: number, userId: string = "t1"): Promise<{ success: boolean, message?: string, data?: any }> {
   try {
-    const res = await fetch(`${API_BASE_URL}/bids/`, {
+    const res = await fetch(`${API_BASE_URL}/bids`, {
       method: "POST",
       headers: getHeaders(userId),
       body: JSON.stringify({

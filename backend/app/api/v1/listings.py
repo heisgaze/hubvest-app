@@ -7,7 +7,7 @@ from typing import List
 
 router = APIRouter()
 
-@router.get("/", response_model=List[schemas.Listing])
+@router.get("", response_model=List[schemas.Listing])
 def get_listings(status: str = "open", db: Session = Depends(get_db)):
     """
     Get all active harvest listings.
@@ -18,7 +18,7 @@ def get_listings(status: str = "open", db: Session = Depends(get_db)):
         listings = db.query(Listing).filter(Listing.status == status).all()
     return listings
 
-@router.post("/", response_model=schemas.Listing)
+@router.post("", response_model=schemas.Listing)
 def create_listing(listing: schemas.ListingCreate, db: Session = Depends(get_db)):
     """
     Create a new listing (Petani).

@@ -6,7 +6,7 @@ from typing import List
 
 router = APIRouter()
 
-@router.get("/")
+@router.get("")
 def get_market_prices(db: Session = Depends(get_db)):
     """
     Get current market reference prices for all commodities.

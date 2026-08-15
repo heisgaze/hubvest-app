@@ -7,7 +7,7 @@ from typing import List
 
 router = APIRouter()
 
-@router.post("/", response_model=schemas.Bid)
+@router.post("", response_model=schemas.Bid)
 def create_bid(bid: schemas.BidBase, db: Session = Depends(get_db)):
     """
     Create a new bid (Tengkulak).
