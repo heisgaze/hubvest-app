@@ -199,11 +199,12 @@ export default function TengkulakApp() {
       const myTransactions = await fetchMyTransactions();
 
       const mappedBids = myBids.map((b: any) => ({
-        id: b.id,
-        farmerName: "Petani", // Hardcoded for now since mock backend might not return deep relations
+        id: b.listingId,
+        farmerId: b.listing?.farmerId || "u1",
+        farmerName: b.listing?.farmer?.name || "Petani", 
         farmerPhoto: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=250",
         commodityName: "Komoditas",
-        quantity: "100 Kg", // Approximation since bid doesn't store volume directly, it's on listing
+        quantity: "100 Kg", 
         offeredPrice: b.amount,
         totalPrice: b.amount * 100,
         status: b.status === "pending" ? "Menunggu Konfirmasi" : b.status === "rejected" ? "Dibatalkan" : "Selesai",
@@ -217,6 +218,7 @@ export default function TengkulakApp() {
 
       const mappedTrans = myTransactions.map((t: any) => ({
         id: t.id,
+        farmerId: t.farmerId || t.farmer?.id || "u1",
         farmerName: t.farmer?.name || "Petani",
         farmerPhoto: t.farmer?.avatar || "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=250",
         commodityName: t.commodity?.name || "Sayuran",
@@ -341,7 +343,7 @@ export default function TengkulakApp() {
     // Attempt to extract farmer ID. Since OrderItem doesn't store farmer ID natively right now,
     // we use a dummy farmer ID for demonstration, but it should be passed from the actual transaction.
     // In our DB, "5a351aad-6070-4264-a6e0-bed3232ab399" is the default Petani.
-    const res = await submitReview(screenView.order.id, "5a351aad-6070-4264-a6e0-bed3232ab399", rating, comment, "t1");
+    const res = await submitReview(screenView.order.id, screenView.order.farmerId || "u1", rating, comment, "t1");
     
     if (!res.success) {
       alert("Gagal mengirim ulasan: " + res.message);

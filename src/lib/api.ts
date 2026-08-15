@@ -372,7 +372,28 @@ export async function fetchMyBids(userId: string = "t1"): Promise<Bid[]> {
   try {
     const res = await fetch(`${API_BASE_URL}/bids/me/bids`, { cache: "no-store", headers: getHeaders(userId) });
     if (!res.ok) return [];
-    return await res.json();
+    const items = await res.json();
+    return items.map((b: any) => ({
+      id: b.id,
+      listingId: b.listing_id,
+      tengkulakId: b.bidder_id,
+      tengkulak: b.bidder ? {
+        id: b.bidder.id,
+        name: b.bidder.name,
+        role: b.bidder.role,
+        avatar: b.bidder.avatar,
+        phone: b.bidder.phone,
+        location: b.bidder.location,
+        rating: b.bidder.rating,
+        totalTransactions: b.bidder.total_transactions,
+        joinedDate: b.bidder.created_at,
+        verified: b.bidder.verified
+      } : { id: "t1", name: "Tengkulak", role: "tengkulak", avatar: "", phone: "08123456789", location: "Pasar", rating: 5.0, totalTransactions: 10, joinedDate: "", verified: true },
+      price: b.amount,
+      message: "Berminat beli panen ini",
+      status: b.status,
+      createdAt: b.created_at
+    }));
   } catch (error) {
     console.error("fetchMyBids error:", error);
     return [];
@@ -383,7 +404,28 @@ export async function fetchIncomingBids(userId: string = "u1"): Promise<Bid[]> {
   try {
     const res = await fetch(`${API_BASE_URL}/bids/incoming/bids`, { cache: "no-store", headers: getHeaders(userId) });
     if (!res.ok) return [];
-    return await res.json();
+    const items = await res.json();
+    return items.map((b: any) => ({
+      id: b.id,
+      listingId: b.listing_id,
+      tengkulakId: b.bidder_id,
+      tengkulak: b.bidder ? {
+        id: b.bidder.id,
+        name: b.bidder.name,
+        role: b.bidder.role,
+        avatar: b.bidder.avatar,
+        phone: b.bidder.phone,
+        location: b.bidder.location,
+        rating: b.bidder.rating,
+        totalTransactions: b.bidder.total_transactions,
+        joinedDate: b.bidder.created_at,
+        verified: b.bidder.verified
+      } : { id: "t1", name: "Tengkulak", role: "tengkulak", avatar: "", phone: "08123456789", location: "Pasar", rating: 5.0, totalTransactions: 10, joinedDate: "", verified: true },
+      price: b.amount,
+      message: "Berminat beli panen ini",
+      status: b.status,
+      createdAt: b.created_at
+    }));
   } catch (error) {
     console.error("fetchIncomingBids error:", error);
     return [];
