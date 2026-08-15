@@ -73,6 +73,7 @@ export interface HandshakeReceiptData {
 
 export interface OrderItem {
   id: string;
+  farmerId?: string;
   farmerName: string;
   farmerPhoto: string;
   commodityName: string;

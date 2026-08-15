@@ -7,7 +7,6 @@ import ContractSummary from "@/components/petani/transaction/ContractSummary";
 import StatusTimeline from "@/components/petani/transaction/StatusTimeline";
 import MarkAsPickedUpButton from "@/components/petani/transaction/MarkAsPickedUpButton";
 import CancelTransactionButton from "@/components/petani/transaction/CancelTransactionButton";
-import { fetchTransactionDetail } from "@/lib/api";
 import { Transaction } from "@/lib/types";
 
 export default function TransactionDetailPage({ params }: { params: { id: string } }) {
