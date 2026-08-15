@@ -1,6 +1,13 @@
 import { MarketPrice, Listing, Transaction, GradeResult, Bid, Commodity, User } from "./types";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1";
+const getBaseUrl = () => {
+  if (typeof window !== 'undefined') return ''; // Browser should use relative path
+  if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL.replace('/api/v1', '');
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  return 'http://127.0.0.1:3000'; // SSR fallback
+};
+
+const API_BASE_URL = `${getBaseUrl()}/api/v1`;
 
 // Helper to construct headers
 function getHeaders(userId: string = "u1", extraHeaders = {}) {
