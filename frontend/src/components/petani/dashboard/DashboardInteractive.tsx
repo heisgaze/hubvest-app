@@ -58,11 +58,11 @@ export default function DashboardInteractive({ initialMarketPrices }: { initialM
       {/* Category Filter */}
       <div className="animate-slide-up space-y-4">
         <div>
-          <h2 className="text-sm font-semibold text-gray-700 mb-2 px-1">Wilayah</h2>
+          <h2 className="text-[10px] uppercase font-bold tracking-wider text-gray-400 mb-2 px-1">Wilayah</h2>
           <select 
             value={selectedLocation} 
             onChange={(e) => setSelectedLocation(e.target.value)}
-            className="w-full bg-white rounded-xl border border-gray-200 px-4 py-2.5 text-sm text-gray-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none"
+            className="w-full bg-white rounded-[16px] border border-gray-200/80 px-4 py-2.5 text-sm font-semibold text-[#12241A] focus:outline-none focus:border-[#2A4736] focus:ring-1 focus:ring-[#2A4736] shadow-sm appearance-none"
           >
             {locations.map(loc => (
               <option key={loc} value={loc}>{loc}</option>
@@ -71,7 +71,7 @@ export default function DashboardInteractive({ initialMarketPrices }: { initialM
         </div>
         
         <div>
-          <h2 className="text-sm font-semibold text-gray-700 mb-3 px-1">Kategori Komoditas</h2>
+          <h2 className="text-[10px] uppercase font-bold tracking-wider text-gray-400 mb-3 px-1">Kategori Komoditas</h2>
           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
             {commodities.map((commodity) => (
               <button
