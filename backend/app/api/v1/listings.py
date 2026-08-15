@@ -48,16 +48,22 @@ def delete_listing(id: str, db: Session = Depends(get_db)):
     if not listing:
         raise HTTPException(status_code=404, detail="Listing not found")
     
-    # Also delete associated bids, transactions, and reviews to avoid constraint errors
-    from app.db.models import Bid, Transaction, Review
-    transactions = db.query(Transaction).filter(Transaction.listing_id == id).all()
-    transaction_ids = [t.id for t in transactions]
-    if transaction_ids:
-        db.query(Review).filter(Review.transaction_id.in_(transaction_ids)).delete(synchronize_session=False)
+    try:
+        # Also delete associated bids, transactions, and reviews to avoid constraint errors
+        from app.db.models import Bid, Transaction, Review
+        transactions = db.query(Transaction).filter(Transaction.listing_id == id).all()
+        transaction_ids = [t.id for t in transactions]
+        if transaction_ids:
+            db.query(Review).filter(Review.transaction_id.in_(transaction_ids)).delete(synchronize_session=False)
+            
+        db.query(Transaction).filter(Transaction.listing_id == id).delete(synchronize_session=False)
+        db.query(Bid).filter(Bid.listing_id == id).delete(synchronize_session=False)
         
-    db.query(Transaction).filter(Transaction.listing_id == id).delete()
-    db.query(Bid).filter(Bid.listing_id == id).delete()
-    
-    db.delete(listing)
-    db.commit()
-    return {"message": "Listing deleted successfully"}
+        db.delete(listing)
+        db.commit()
+        return {"message": "Listing deleted successfully"}
+    except Exception as e:
+        import traceback
+        tb = traceback.format_exc()
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Delete failed: {str(e)}\n{tb}")
