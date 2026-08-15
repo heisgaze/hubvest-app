@@ -48,8 +48,13 @@ def delete_listing(id: str, db: Session = Depends(get_db)):
     if not listing:
         raise HTTPException(status_code=404, detail="Listing not found")
     
-    # Also delete associated bids and transactions to avoid constraint errors
-    from ...db.models import Bid, Transaction
+    # Also delete associated bids, transactions, and reviews to avoid constraint errors
+    from app.db.models import Bid, Transaction, Review
+    transactions = db.query(Transaction).filter(Transaction.listing_id == id).all()
+    transaction_ids = [t.id for t in transactions]
+    if transaction_ids:
+        db.query(Review).filter(Review.transaction_id.in_(transaction_ids)).delete(synchronize_session=False)
+        
     db.query(Transaction).filter(Transaction.listing_id == id).delete()
     db.query(Bid).filter(Bid.listing_id == id).delete()
     
