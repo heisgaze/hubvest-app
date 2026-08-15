@@ -1,14 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ListingCard from "@/components/petani/listing/ListingCard";
 import Link from "next/link";
 import { Listing } from "@/lib/types";
+import { fetchListings } from "@/lib/api";
 
 export default function ListingView({ initialListings }: { initialListings: Listing[] }) {
   const [activeFilter, setActiveFilter] = useState<"Semua" | "Aktif" | "Negosiasi" | "Terjual">("Semua");
+  const [listings, setListings] = useState<Listing[]>(initialListings);
 
-  const filteredListings = initialListings.filter((listing: Listing) => {
+  useEffect(() => {
+    const loadListings = async () => {
+      try {
+        const data = await fetchListings("all");
+        if (data && data.length > 0) {
+          setListings(data);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    loadListings();
+  }, []);
+
+  const filteredListings = listings.filter((listing: Listing) => {
     if (activeFilter === "Semua") return true;
     if (activeFilter === "Aktif") return listing.status === "open";
     if (activeFilter === "Negosiasi") return listing.status === "locked";

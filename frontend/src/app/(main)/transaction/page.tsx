@@ -1,18 +1,38 @@
-import React from "react";
+"use client";
+
+import React, { useState, useEffect } from "react";
 import HeaderBar from "@/components/petani/ui/HeaderBar";
 import { fetchIncomingBids } from "@/lib/api";
 import Link from "next/link";
 import BidCard from "@/components/petani/listing/BidCard";
+import { Bid } from "@/lib/types";
 
-export default async function TransactionsPage() {
-  const incomingBids = await fetchIncomingBids();
-  
+export default function TransactionsPage() {
+  const [incomingBids, setIncomingBids] = useState<Bid[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const bids = await fetchIncomingBids();
+        setIncomingBids(bids);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadData();
+  }, []);
+
   return (
     <div className="min-h-screen bg-surface-bg pb-24">
       <HeaderBar title="Tawaran Masuk" showBack />
       
       <main className="px-4 py-4 space-y-4">
-        {incomingBids.length > 0 ? (
+        {loading ? (
+          <div className="text-center py-20 text-gray-500">Memuat data...</div>
+        ) : incomingBids.length > 0 ? (
           incomingBids.map((bid) => (
             <BidCard key={bid.id} bid={bid} />
           ))

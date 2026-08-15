@@ -27,8 +27,13 @@ export default async function DashboardPage() {
   }
 
   const marketPrices = await fetchMarketPrices();
-  
-  const trending: any[] = [];
+
+  const trending: any[] = [
+    { name: "Bawang Merah", change: 2.5, trend: "up" },
+    { name: "Cabai Rawit Merah", change: 5.0, trend: "up" },
+    { name: "Beras Medium", change: -1.2, trend: "down" },
+    { name: "Kentang Dieng", change: 0, trend: "stable" }
+  ];
 
   const rightActions = (
     <div className="flex items-center gap-3">

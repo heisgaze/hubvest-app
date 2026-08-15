@@ -50,6 +50,7 @@ class Listing(Base):
     status = Column(String, default="open") # open, locked, completed
     grade = Column(String, nullable=True) # A, B, C from CV
     description = Column(Text, nullable=True)
+    image_url = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     
     seller = relationship("User", foreign_keys=[seller_id])

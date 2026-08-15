@@ -1,23 +1,47 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { MarketPrice } from "@/lib/types";
 import PFICalculator from "./PFICalculator";
 import MarketPriceSection from "./MarketPriceSection";
+import { fetchMarketPrices } from "@/lib/api";
 
 export default function DashboardInteractive({ initialMarketPrices }: { initialMarketPrices: MarketPrice[] }) {
+  const [marketPrices, setMarketPrices] = useState<MarketPrice[]>(initialMarketPrices);
+
+  useEffect(() => {
+    // Re-fetch on client side to bypass any Node.js sandbox EPERM issues
+    const loadPrices = async () => {
+      try {
+        const prices = await fetchMarketPrices();
+        if (prices && prices.length > 0) {
+          setMarketPrices(prices);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    loadPrices();
+  }, []);
+
   // Get unique commodity names and locations for filter chips
-  const commodities = Array.from(new Set(initialMarketPrices.map(p => p.commodity.name)));
+  const commodities = Array.from(new Set(marketPrices.map(p => p.commodity.name)));
   // Ensure we have at least one valid commodity if not empty
   const defaultCommodity = commodities.length > 0 ? commodities[0] : "";
   
   const [selectedCommodity, setSelectedCommodity] = useState<string>(defaultCommodity);
   const [selectedLocation, setSelectedLocation] = useState<string>("Semua");
 
+  useEffect(() => {
+    if (!selectedCommodity && commodities.length > 0) {
+      setSelectedCommodity(commodities[0]);
+    }
+  }, [commodities, selectedCommodity]);
+
   const locations = ["Semua", "Brebes", "Bandung", "Malang", "Wonosobo", "Garut", "Nganjuk", "Kediri", "Enrekang", "Bima", "Agam"];
 
   // Filter prices based on selection
-  const filteredPrices = initialMarketPrices.filter(p => {
+  const filteredPrices = marketPrices.filter(p => {
     const matchCommodity = p.commodity.name === selectedCommodity;
     const matchLocation = selectedLocation === "Semua" || p.location === selectedLocation;
     return matchCommodity && matchLocation;
@@ -54,7 +78,7 @@ export default function DashboardInteractive({ initialMarketPrices }: { initialM
                 key={commodity}
                 onClick={() => setSelectedCommodity(commodity)}
                 className={`px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
-                  selectedCommodity === commodity
+                  (selectedCommodity === commodity || (!selectedCommodity && commodities.length > 0 && commodity === commodities[0]))
                     ? "bg-primary text-white shadow-sm"
                     : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
                 }`}

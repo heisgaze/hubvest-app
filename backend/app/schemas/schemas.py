@@ -49,6 +49,7 @@ class ListingBase(BaseModel):
     location: str
     description: Optional[str] = None
     grade: Optional[str] = None
+    image_url: Optional[str] = None
 
 class ListingCreate(ListingBase):
     seller_id: str
@@ -90,6 +91,9 @@ class Transaction(TransactionBase):
     id: str
     status: str
     created_at: datetime
+    listing: Optional[Listing] = None
+    seller: Optional[User] = None
+    buyer: Optional[User] = None
     
     model_config = ConfigDict(from_attributes=True)
 

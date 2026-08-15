@@ -58,10 +58,17 @@ export default function ListingCard({ listing }: ListingCardProps) {
   return (
     <Link href={`/listing/${listing.id}`}>
       <div className="card card-hover flex items-start gap-3 p-4 bg-white rounded-2xl shadow-card transition-all mb-4">
-        {/* Placeholder Image */}
-        <div className="w-20 h-20 rounded-xl flex-shrink-0 flex items-center justify-center text-3xl" style={{ backgroundColor: '#F0F7F4' }}>
-          {getCommodityEmoji(listing.commodity?.name)}
-        </div>
+        {/* Image / Placeholder */}
+        {listing.images && listing.images.length > 0 ? (
+          <div 
+            className="w-20 h-20 rounded-xl flex-shrink-0 bg-cover bg-center border border-gray-100" 
+            style={{ backgroundImage: `url(${listing.images[0]})` }}
+          />
+        ) : (
+          <div className="w-20 h-20 rounded-xl flex-shrink-0 flex items-center justify-center text-3xl" style={{ backgroundColor: '#F0F7F4' }}>
+            {getCommodityEmoji(listing.commodity?.name)}
+          </div>
+        )}
 
         <div className="flex-1">
           <div className="flex justify-between items-start mb-1">

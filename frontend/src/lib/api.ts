@@ -1,6 +1,6 @@
 import { MarketPrice, Listing, Transaction, GradeResult, Bid, Commodity, User } from "./types";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1";
 
 // Helper to construct headers
 function getHeaders(userId: string = "u1", extraHeaders = {}) {
@@ -28,7 +28,7 @@ export async function fetchMarketPrices(userId: string = "u1"): Promise<MarketPr
         wholesalePrice: item.price * 1.1,
         consumerPrice: item.price * 1.25,
         trend: item.trend,
-        changePercent: 0,
+        changePercent: item.trend === "up" ? 2.5 : item.trend === "down" ? -1.5 : 0,
         date: item.date,
         location: item.location || "Brebes",
         sparklineData: [65, 59, 80, 81, 56, 55, 40]
@@ -41,14 +41,55 @@ export async function fetchMarketPrices(userId: string = "u1"): Promise<MarketPr
 }
 
 // ---------------------------------------------------------------------------
+// Reviews
+// ---------------------------------------------------------------------------
+
+export async function submitReview(
+  transactionId: string, 
+  revieweeId: string, 
+  rating: number, 
+  comment: string = "", 
+  userId: string = "u1"
+): Promise<{ success: boolean, message?: string }> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/transactions/${transactionId}/reviews`, {
+      method: "POST",
+      headers: getHeaders(userId),
+      body: JSON.stringify({
+        transaction_id: transactionId,
+        reviewer_id: userId,
+        reviewee_id: revieweeId,
+        rating: rating,
+        comment: comment
+      })
+    });
+    
+    if (!res.ok) {
+      const data = await res.json();
+      return { success: false, message: data.detail || "Gagal mengirim penilaian" };
+    }
+    
+    return { success: true };
+  } catch (error) {
+    console.error("submitReview error:", error);
+    return { success: false, message: "Terjadi kesalahan server" };
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Computer Vision
 // ---------------------------------------------------------------------------
 
-export async function analyzeCV(userId: string = "u1"): Promise<GradeResult | null> {
+export async function analyzeCV(imageBlob?: Blob | File, userId: string = "u1"): Promise<GradeResult | null> {
   try {
     const formData = new FormData();
-    const mockFile = new Blob(["mock"], { type: "image/jpeg" });
-    formData.append("file", mockFile, "mock.jpg");
+    
+    if (imageBlob) {
+      formData.append("file", imageBlob, "scan.jpg");
+    } else {
+      const mockFile = new Blob(["mock"], { type: "image/jpeg" });
+      formData.append("file", mockFile, "mock.jpg");
+    }
 
     const res = await fetch(`${API_BASE_URL}/cv/analyze`, {
       method: "POST",
@@ -120,7 +161,7 @@ export async function fetchListings(status: string = "open", userId: string = "u
       harvestDate: item.created_at,
       grade: item.grade || "B",
       description: item.description || "",
-      images: [],
+      images: item.image_url ? [item.image_url] : [],
       status: item.status,
       bidCount: 0,
       createdAt: item.created_at,
@@ -128,6 +169,45 @@ export async function fetchListings(status: string = "open", userId: string = "u
   } catch (error) {
     console.error("fetchListings error:", error);
     return [];
+  }
+}
+
+export async function createListing(payload: any, userId: string = "u1"): Promise<{ success: boolean, message?: string }> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/listings/`, {
+      method: "POST",
+      headers: getHeaders(userId),
+      body: JSON.stringify(payload)
+    });
+    
+    if (!res.ok) {
+      const data = await res.json();
+      return { success: false, message: data.detail || "Gagal membuat listing" };
+    }
+    
+    return { success: true };
+  } catch (error) {
+    console.error("createListing error:", error);
+    return { success: false, message: "Terjadi kesalahan koneksi" };
+  }
+}
+
+export async function deleteListing(id: string, userId: string = "u1"): Promise<{ success: boolean, message?: string }> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/listings/${id}`, {
+      method: "DELETE",
+      headers: getHeaders(userId),
+    });
+    
+    if (!res.ok) {
+      const data = await res.json();
+      return { success: false, message: data.detail || "Gagal menghapus listing" };
+    }
+    
+    return { success: true };
+  } catch (error) {
+    console.error("deleteListing error:", error);
+    return { success: false, message: "Terjadi kesalahan koneksi" };
   }
 }
 
@@ -166,7 +246,7 @@ export async function fetchListing(id: string, userId: string = "u1"): Promise<{
       harvestDate: item.created_at,
       grade: item.grade || "B",
       description: item.description || "",
-      images: [],
+      images: item.image_url ? [item.image_url] : [],
       status: item.status,
       bidCount: 0,
       createdAt: item.created_at,

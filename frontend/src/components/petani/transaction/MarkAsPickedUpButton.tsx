@@ -24,7 +24,7 @@ export default function MarkAsPickedUpButton({ transactionId }: Props) {
       }
 
       alert("Transaksi berhasil diselesaikan!");
-      router.refresh();
+      window.location.reload();
     } catch (error: any) {
       console.error(error);
       alert(error.message || "Terjadi kesalahan saat mengonfirmasi.");

@@ -25,7 +25,7 @@ import { BiddingView } from "@/components/tengkulak/views/BiddingView";
 import { ReceiptView } from "@/components/tengkulak/views/ReceiptView";
 import { TransactionDetailView } from "@/components/tengkulak/views/TransactionDetailView";
 
-import { fetchListings, submitBid, fetchMyBids, fetchMyTransactions, cancelTransaction } from "@/lib/api";
+import { fetchListings, submitBid, fetchMyBids, fetchMyTransactions, cancelTransaction, fetchMarketPrices, completeTransaction, submitReview } from "@/lib/api";
 
 import { CommodityDetailModal } from "@/components/tengkulak/modals/CommodityDetailModal";
 import { FarmerDetailModal } from "@/components/tengkulak/modals/FarmerDetailModal";
@@ -43,76 +43,83 @@ export default function TengkulakApp() {
       category: 'Sayuran',
       price: 25000,
       unit: 'Kg',
-      changePercent: 1.2,
+      changePercent: 0,
       isUp: true,
       color: '#ef4444',
       iconType: 'bawang',
       iconBg: '#fee2e2',
       sparkline: [24000, 24500, 24800, 25000],
       marketPrices: [
-        { location: 'Pasar Induk Kramat Jati', price: 26000, updatedAt: 'Hari ini, 08:00' },
-        { location: 'Pasar Induk Cibitung', price: 25500, updatedAt: 'Hari ini, 07:30' }
+        { location: 'Brebes', price: 25000, updatedAt: 'Hari ini, 08:00' },
+        { location: 'Bandung', price: 28000, updatedAt: 'Hari ini, 07:30' },
+        { location: 'Nganjuk', price: 24500, updatedAt: 'Hari ini, 09:00' },
+        { location: 'Enrekang', price: 23000, updatedAt: 'Hari ini, 10:00' }
       ],
       description: 'Bawang merah berkualitas tinggi dari Brebes.',
       qualityGrade: 'Grade A'
     },
     {
       id: 'c2',
-      name: 'Cabai Merah',
+      name: 'Cabai Rawit Merah',
       category: 'Sayuran',
-      price: 40000,
+      price: 45000,
       unit: 'Kg',
-      changePercent: -0.5,
-      isUp: false,
+      changePercent: 5.5,
+      isUp: true,
       color: '#dc2626',
       iconType: 'cabai',
       iconBg: '#fef2f2',
-      sparkline: [42000, 41000, 40500, 40000],
+      sparkline: [40000, 42000, 44000, 45000],
       marketPrices: [
-        { location: 'Pasar Induk Kramat Jati', price: 42000, updatedAt: 'Hari ini, 08:00' }
+        { location: 'Garut', price: 45000, updatedAt: 'Hari ini, 08:00' },
+        { location: 'Kediri', price: 42000, updatedAt: 'Hari ini, 09:30' },
+        { location: 'Bandung', price: 48000, updatedAt: 'Hari ini, 10:15' }
       ],
-      description: 'Cabai merah besar segar, cocok untuk industri makanan.',
-      qualityGrade: 'Grade B'
+      description: 'Cabai rawit merah pedas segar, cocok untuk industri sambal.',
+      qualityGrade: 'Grade A'
     },
     {
       id: 'c3',
+      name: 'Beras Medium',
+      category: 'Pangan',
+      price: 14000,
+      unit: 'Kg',
+      changePercent: -1.2,
+      isUp: false,
+      color: '#f97316',
+      iconType: 'beras',
+      iconBg: '#ffedd5',
+      sparkline: [14200, 14100, 14050, 14000],
+      marketPrices: [
+        { location: 'Indramayu', price: 14000, updatedAt: 'Hari ini, 07:45' },
+        { location: 'Cianjur', price: 14500, updatedAt: 'Hari ini, 08:15' },
+        { location: 'Ngawi', price: 13800, updatedAt: 'Hari ini, 09:00' }
+      ],
+      description: 'Beras medium pulen pilihan langsung dari petani.',
+      qualityGrade: 'Grade B'
+    },
+    {
+      id: 'c4',
       name: 'Tomat',
       category: 'Sayuran',
-      price: 8000,
+      price: 8500,
       unit: 'Kg',
-      changePercent: 2.4,
-      isUp: true,
-      color: '#f97316',
+      changePercent: -3.5,
+      isUp: false,
+      color: '#94a3b8',
       iconType: 'tomat',
-      iconBg: '#ffedd5',
-      sparkline: [7500, 7800, 7900, 8000],
+      iconBg: '#f1f5f9',
+      sparkline: [9500, 9000, 8800, 8500],
       marketPrices: [
-        { location: 'Pasar Induk Cibitung', price: 8500, updatedAt: 'Hari ini, 07:45' }
+        { location: 'Malang', price: 8500, updatedAt: 'Hari ini, 06:00' },
+        { location: 'Bandung', price: 9000, updatedAt: 'Hari ini, 07:00' }
       ],
       description: 'Tomat segar pilihan langsung dari petani.',
       qualityGrade: 'Grade A'
     },
     {
-      id: 'c4',
-      name: 'Bawang Putih',
-      category: 'Sayuran',
-      price: 30000,
-      unit: 'Kg',
-      changePercent: 0,
-      isUp: true,
-      color: '#94a3b8',
-      iconType: 'bawang',
-      iconBg: '#f1f5f9',
-      sparkline: [30000, 30000, 30000, 30000],
-      marketPrices: [
-        { location: 'Pasar Induk Kramat Jati', price: 31000, updatedAt: 'Hari ini, 06:00' }
-      ],
-      description: 'Bawang putih impor & lokal berkualitas.',
-      qualityGrade: 'Grade B'
-    },
-    {
       id: 'c5',
-      name: 'Kentang',
+      name: 'Kentang Dieng',
       category: 'Sayuran',
       price: 15000,
       unit: 'Kg',
@@ -123,9 +130,10 @@ export default function TengkulakApp() {
       iconBg: '#fef9c3',
       sparkline: [14000, 14500, 14800, 15000],
       marketPrices: [
-        { location: 'Pasar Induk Cibitung', price: 16000, updatedAt: 'Hari ini, 07:15' }
+        { location: 'Wonosobo', price: 15000, updatedAt: 'Hari ini, 07:15' },
+        { location: 'Pangalengan', price: 15500, updatedAt: 'Hari ini, 08:30' }
       ],
-      description: 'Kentang Dieng ukuran besar, mulus.',
+      description: 'Kentang Dieng ukuran besar, mulus dan minim cacat.',
       qualityGrade: 'Grade A'
     }
   ]);
@@ -135,13 +143,37 @@ export default function TengkulakApp() {
 
   // Load listings from Backend
   React.useEffect(() => {
+    const loadMarketData = async () => {
+      const apiPrices = await fetchMarketPrices();
+      if (apiPrices && apiPrices.length > 0) {
+        setCommodities(prev => prev.map(c => {
+          const pricesForCommodity = apiPrices.filter(p => p.commodity.name.toLowerCase().includes(c.name.toLowerCase()));
+          if (pricesForCommodity.length > 0) {
+            return {
+              ...c,
+              price: pricesForCommodity[0].producerPrice,
+              changePercent: pricesForCommodity[0].trend === 'up' ? 2.5 : pricesForCommodity[0].trend === 'down' ? -1.5 : 0,
+              isUp: pricesForCommodity[0].trend === 'up' || pricesForCommodity[0].trend === 'stable',
+              marketPrices: pricesForCommodity.map(p => ({
+                location: p.location,
+                price: p.producerPrice,
+                updatedAt: 'Hari ini'
+              }))
+            };
+          }
+          return c;
+        }));
+      }
+    };
+    loadMarketData();
+
     fetchListings("open").then((listings) => {
       const mapped = listings.map(l => ({
         id: l.id,
         farmerName: l.farmer.name,
         farmerPhoto: l.farmer.avatar || "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=250",
         commodityName: l.commodity.name,
-        commodityPhoto: "https://images.unsplash.com/photo-1618512496248-a07fe83aa8cf?auto=format&fit=crop&q=80&w=800",
+        commodityPhoto: (l.images && l.images.length > 0) ? l.images[0] : "https://images.unsplash.com/photo-1618512496248-a07fe83aa8cf?auto=format&fit=crop&q=80&w=800",
         location: l.location,
         distance: "12 km",
         estimatedPrice: l.minPrice,
@@ -287,8 +319,15 @@ export default function TengkulakApp() {
     setScreenView({ type: 'TAB', tab: 'ORDERS' });
   };
 
-  const handleConfirmPickupAndReview = (order: OrderItem) => {
-    // Update order status to Selesai
+  const handleConfirmPickupAndReview = async (order: OrderItem) => {
+    // API Call to complete transaction
+    const res = await completeTransaction(order.id, "t1");
+    if (!res.success) {
+      alert("Gagal menyelesaikan transaksi: " + res.message);
+      return;
+    }
+
+    // Update order status to Selesai locally
     setOrders((prev) =>
       prev.map((o) => (o.id === order.id ? { ...o, status: 'Selesai' } : o))
     );
@@ -296,7 +335,19 @@ export default function TengkulakApp() {
     setScreenView({ type: 'REVIEW', order });
   };
 
-  const handleReviewSubmitted = (rating: number, comment: string) => {
+  const handleReviewSubmitted = async (rating: number, comment: string) => {
+    if (screenView.type !== 'REVIEW') return;
+    
+    // Attempt to extract farmer ID. Since OrderItem doesn't store farmer ID natively right now,
+    // we use a dummy farmer ID for demonstration, but it should be passed from the actual transaction.
+    // In our DB, "5a351aad-6070-4264-a6e0-bed3232ab399" is the default Petani.
+    const res = await submitReview(screenView.order.id, "5a351aad-6070-4264-a6e0-bed3232ab399", rating, comment, "t1");
+    
+    if (!res.success) {
+      alert("Gagal mengirim ulasan: " + res.message);
+      return;
+    }
+
     alert(`Terima kasih! Ulasan ${rating} bintang berhasil dikirim ke mitra pertanian.`);
     setScreenView({ type: 'TAB', tab: 'ORDERS' });
   };

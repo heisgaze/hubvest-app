@@ -63,7 +63,20 @@ export default function CameraViewfinder() {
       {/* Capture Button */}
       <div className="mb-8 z-10">
         <button 
-          onClick={() => router.push("/scan/result")}
+          onClick={() => {
+            if (videoRef.current) {
+              const canvas = document.createElement("canvas");
+              canvas.width = videoRef.current.videoWidth;
+              canvas.height = videoRef.current.videoHeight;
+              const ctx = canvas.getContext("2d");
+              if (ctx) {
+                ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+                const dataUrl = canvas.toDataURL("image/jpeg", 0.8);
+                sessionStorage.setItem("scannedImage", dataUrl);
+              }
+            }
+            router.push("/scan/result");
+          }}
           className="w-20 h-20 rounded-full border-4 border-accent bg-white flex items-center justify-center shadow-lg active:scale-95 transition-transform"
         >
           <div className="w-16 h-16 rounded-full border-2 border-gray-200"></div>

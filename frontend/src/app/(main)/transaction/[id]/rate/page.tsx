@@ -4,7 +4,7 @@ import { useRouter, useParams } from 'next/navigation';
 import HeaderBar from '@/components/petani/ui/HeaderBar';
 import StarRating from '@/components/petani/ui/StarRating';
 
-import { fetchTransactionDetail } from '@/lib/api';
+import { fetchTransactionDetail, submitReview } from '@/lib/api';
 import { Transaction } from '@/lib/types';
 
 
@@ -25,19 +25,30 @@ export default function RatingPage() {
 
   const partner = transaction?.tengkulak; // Assuming current user is farmer
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (rating === 0) return;
+    if (rating === 0 || !transaction || !partner) return;
     
     setIsSubmitting(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
+    
+    const res = await submitReview(
+      transaction.id, 
+      partner.id, // Petani submitting review for Tengkulak
+      rating, 
+      comment, 
+      "u1" // Petani User ID
+    );
+    
+    setIsSubmitting(false);
+    
+    if (res.success) {
       setIsSuccess(true);
       setTimeout(() => {
         router.push("/transaction"); // Go back to transactions list
       }, 1500);
-    }, 1000);
+    } else {
+      alert("Gagal mengirim ulasan: " + res.message);
+    }
   };
 
   if (!transaction || !partner) return null;

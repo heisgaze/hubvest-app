@@ -10,9 +10,10 @@ import { acceptBid, rejectBid } from "@/lib/api";
 
 interface BidCardProps {
   bid: Bid;
+  hideActions?: boolean;
 }
 
-export default function BidCard({ bid }: BidCardProps) {
+export default function BidCard({ bid, hideActions = false }: BidCardProps) {
   const router = useRouter();
   const [isAccepting, setIsAccepting] = useState(false);
   const [isRejecting, setIsRejecting] = useState(false);
@@ -101,22 +102,36 @@ export default function BidCard({ bid }: BidCardProps) {
         </p>
       </div>
 
-      <div className="flex gap-2">
-        <button 
-          onClick={handleRejectBid}
-          disabled={isRejecting || isAccepting}
-          className="flex-1 py-2 px-4 rounded-xl border border-red-500 text-red-500 font-medium text-sm hover:bg-red-50 transition-colors disabled:opacity-50"
-        >
-          {isRejecting ? "Memproses..." : "Tolak"}
-        </button>
-        <button 
-          onClick={handleAcceptBid}
-          disabled={isAccepting || isRejecting}
-          className="flex-1 py-2 px-4 rounded-xl bg-primary text-white font-medium text-sm hover:bg-primary-light transition-colors shadow-sm disabled:opacity-50"
-        >
-          {isAccepting ? "Memproses..." : "Terima"}
-        </button>
-      </div>
+      {!hideActions && bid.status === "pending" && (
+        <div className="flex gap-2">
+          <button 
+            onClick={handleRejectBid}
+            disabled={isRejecting || isAccepting}
+            className="flex-1 py-2 px-4 rounded-xl border border-red-500 text-red-500 font-medium text-sm hover:bg-red-50 transition-colors disabled:opacity-50"
+          >
+            {isRejecting ? "Memproses..." : "Tolak"}
+          </button>
+          <button 
+            onClick={handleAcceptBid}
+            disabled={isAccepting || isRejecting}
+            className="flex-1 py-2 px-4 rounded-xl bg-primary text-white font-medium text-sm hover:bg-primary-light transition-colors shadow-sm disabled:opacity-50"
+          >
+            {isAccepting ? "Memproses..." : "Terima"}
+          </button>
+        </div>
+      )}
+      
+      {bid.status === "accepted" && (
+        <div className="mt-2 py-2 px-4 bg-green-50 text-green-700 text-center rounded-xl font-bold text-sm">
+          Tawaran Diterima
+        </div>
+      )}
+      
+      {bid.status === "rejected" && (
+        <div className="mt-2 py-2 px-4 bg-red-50 text-red-600 text-center rounded-xl font-bold text-sm">
+          Tawaran Ditolak
+        </div>
+      )}
     </div>
   );
 }
